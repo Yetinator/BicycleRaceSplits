@@ -154,7 +154,8 @@ class My_grid_box(Text):
     grid_row_height = configFile.getValueAsInt("gridBoxHeight")
     grid_box_width = configFile.getValueAsInt("gridBoxWidth")
     def __init__(self, root, this_row, this_column):
-        Text.__init__(root, height=configFile.getValueAsInt("gridBoxHeight"), width=configFile.getValueAsInt("gridBoxWidth")).grid(row=this_row, column = this_column)
+        # Text.__init__(root, height=configFile.getValueAsInt("gridBoxHeight"), width=configFile.getValueAsInt("gridBoxWidth")).grid(row=this_row, column = this_column)
+        pass
         # Text(root, height=configFile.getValueAsInt("gridBoxHeight"), width=configFile.getValueAsInt("gridBoxWidth")).grid(row=this_row, column = this_column)
 
 
@@ -204,13 +205,13 @@ def refresh_screen():
         elapsed_time.grid(row=j, column = elapsed_time_column)
         split_time = Text(root, height=grid_row_height, width=grid_box_width)
         split_time.grid(row=j, column = split_time_column)
-        next = My_grid_box(root,j,4)
+        # next = My_grid_box(root,j,4)
 
         if(current_length >= lap+1):
             #testing length againts a_clock.split_list_peloton
             elapsed_time.insert(INSERT, a_clock.race_time_list_peloton[lap])
             split_time.insert(INSERT, a_clock.split_list_peloton[lap])
-            next.insert(INSERT, "Test")
+            # next.insert(INSERT, "Test")
             #trying to create a split_time list, should this be local or part of the clock function?
             #this_split = a_clock.split_list_peloton[int(lap)] - a_clock.split_list_peloton[int(lap) - 1]
             #split_time.insert(INSERT, this_split)
@@ -218,7 +219,7 @@ def refresh_screen():
             #fill out some null values for remaining cells
             elapsed_time.insert(INSERT, "Null")
             split_time.insert(INSERT, "Null")
-            next.insert(INSERT, "Test")
+            # next.insert(INSERT, "Test")
         lap += 1
 
 def make_screen():
