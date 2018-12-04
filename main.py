@@ -25,13 +25,13 @@ global position_button_row
 global position_grid_label_row
 position_clock_label= [3, 1]
 position_clock_timer = [3,2]
+position_button_row = 4
+position_grid_label_row = 6
 position_grid_row_start = 9
-position_lap_label= [1,position_grid_row_start]
+position_lap_label= [2,position_grid_label_row]
 position_race_time_peloton =[2, position_grid_row_start]
 position_peloton_split = [3, position_grid_row_start ]
 position_break_split = [4, position_grid_row_start]
-position_button_row = 4
-position_grid_label_row = 5
 
 class Watch:
     def reset(self):
@@ -163,20 +163,20 @@ def refreshloop():
     t1 = Text(root, height=2, width=30)
     t1.grid(row=5, column=2)
     t1.insert(INSERT, a_clock.t.get())
-    #t1.config(text= a_clock.t.get())
-    #t1.insert(INSERT, a_clock.t.get())
+
 
 def refresh_screen():
     text_box_width = 15
     #refreshes changing components of software
+    #refreshes at time of mouse click, not per second
     #root.after(1000, refresh_screen)
     #timer component
-    t1 = Text(root, height=2, width=30)
-    t1.grid(row=position_clock_label[0], column=position_clock_label[1])
-    t1.insert(INSERT, a_clock.t.get())
+    # t1 = Text(root, height=2, width=30)
+    # t1.grid(row=position_clock_label[0], column=position_clock_label[1])
+    # t1.insert(INSERT, a_clock.t.get())
     #peloton split grid
     label_elapsed_time = Text(root, height=2, width=30)
-    label_elapsed_time.grid(row=position_race_time_peloton[1], column=position_race_time_peloton[0])
+    label_elapsed_time.grid(row=position_lap_label[1], column=position_lap_label[0])
     label_elapsed_time.insert(INSERT, "Elapsed Time")
     current_length = len(a_clock.split_list_peloton)
     seq_start_row_for_grid = position_grid_row_start
@@ -246,9 +246,9 @@ e3.grid(row=2, column=1)
 
 #text
 #time counter is t1
-t1 = Text(root, height=2, width=30)
-t1.grid(row=position_clock_timer[1], column=position_clock_timer[0])
-t1.insert(INSERT, a_clock.t.get())
+# t1 = Text(root, height=2, width=30)
+# t1.grid(row=position_clock_timer[1], column=position_clock_timer[0])
+# t1.insert(INSERT, a_clock.t.get())
 Label(root, text="Clock").grid(row=5)
 
 #buttons
