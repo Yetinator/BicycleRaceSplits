@@ -6,9 +6,14 @@ from tkinter import *
 import tkinter.filedialog
 import time
 from array import *
+from writeClass import *
 #from filedialog   import askopenfilename
 #class Stopwatch
 #https://www.youtube.com/watch?v=pPvmC0Srdeo
+configFile = ReadFile("configGeneral.txt")
+# global configGeneral
+# configGeneral = configFile.getValuesAsDictionary()
+
 global count
 global refresh_rate
 count = 0 #1 is counter off, 0 is counter on
@@ -25,9 +30,9 @@ global position_button_row
 global position_grid_label_row
 position_clock_label= [3, 1]
 position_clock_timer = [3,2]
-position_button_row = 4
-position_grid_label_row = 6
-position_grid_row_start = 9
+position_button_row = configFile.getValueAsInt("positionButtonRow")
+position_grid_label_row = configFile.getValueAsInt("positionGridLabelRow")
+position_grid_row_start = configFile.getValueAsInt("positionGridDataRow")
 position_lap_label= [2,position_grid_label_row]
 position_race_time_peloton =[2, position_grid_row_start]
 position_peloton_split = [3, position_grid_row_start ]
@@ -139,7 +144,18 @@ class Watch:
 
 
             #continue
+class My_grid_box(Text):
+    # elapsed_time = Text(root, height=grid_row_height, width=grid_box_width)
+    # elapsed_time.grid(row=j, column = elapsed_time_column)
 
+    lap_label_column = configFile.getValueAsInt("positionLapLabelColumn")
+    elapsed_time_column = configFile.getValueAsInt("positionElapsedTimeColumn")
+    split_time_column = configFile.getValueAsInt("positionSplitTimeColumn")
+    grid_row_height = configFile.getValueAsInt("gridBoxHeight")
+    grid_box_width = configFile.getValueAsInt("gridBoxWidth")
+    def __init__(self, root, this_row, this_column):
+        Text.__init__(root, height=configFile.getValueAsInt("gridBoxHeight"), width=configFile.getValueAsInt("gridBoxWidth")).grid(row=this_row, column = this_column)
+        # Text(root, height=configFile.getValueAsInt("gridBoxHeight"), width=configFile.getValueAsInt("gridBoxWidth")).grid(row=this_row, column = this_column)
 
 
 
@@ -160,38 +176,41 @@ def refreshloop():
     #this is actually the second instance of the refresh rate, hope they don't overlap
     #I think this only refreshes the grid, and the other refreshes the timer?
     root.after(refresh_rate, refreshloop)
-    t1 = Text(root, height=2, width=30)
-    t1.grid(row=5, column=2)
-    t1.insert(INSERT, a_clock.t.get())
+    timer_active = Text(root, height=configFile.getValueAsInt("textBoxHeight"), width=configFile.getValueAsInt("textBoxWidth"))
+    timer_active.grid(row=configFile.getValueAsInt("positionTimerRow"), column=configFile.getValueAsInt("positionTimerColumn"))
+    timer_active.insert(INSERT, a_clock.t.get())
 
 
 def refresh_screen():
-    text_box_width = 15
+    text_box_width = configFile.getValueAsInt("textBoxWidth")
+    lap_label_column = configFile.getValueAsInt("positionLapLabelColumn")
+    elapsed_time_column = configFile.getValueAsInt("positionElapsedTimeColumn")
+    split_time_column = configFile.getValueAsInt("positionSplitTimeColumn")
+    grid_row_height = configFile.getValueAsInt("gridBoxHeight")
+    grid_box_width = configFile.getValueAsInt("gridBoxWidth")
     #refreshes changing components of software
     #refreshes at time of mouse click, not per second
     #root.after(1000, refresh_screen)
-    #timer component
-    # t1 = Text(root, height=2, width=30)
-    # t1.grid(row=position_clock_label[0], column=position_clock_label[1])
-    # t1.insert(INSERT, a_clock.t.get())
+    #timer component not welcome here
     #peloton split grid
-    label_elapsed_time = Text(root, height=2, width=30)
-    label_elapsed_time.grid(row=position_lap_label[1], column=position_lap_label[0])
-    label_elapsed_time.insert(INSERT, "Elapsed Time")
     current_length = len(a_clock.split_list_peloton)
     seq_start_row_for_grid = position_grid_row_start
     lap = 0
-    for j in range(seq_start_row_for_grid, 35 + seq_start_row_for_grid):
-        Label(root, text="Lap " + str(lap) + ":   ").grid(row=j, column = 1)
-        elapsed_time = Text(root, height=1, width=text_box_width)
-        elapsed_time.grid(row=j, column = 2)
-        split_time = Text(root, height=1, width=text_box_width)
-        split_time.grid(row=j, column = 3)
+    #A loop that populates the splits grid
+    for j in range(seq_start_row_for_grid, configFile.getValueAsInt("lapsTotal") + seq_start_row_for_grid):
+        #a grid box should probably be a class object
+        Label(root, text="Lap " + str(lap + 1) + ":   ").grid(row=j, column = lap_label_column)
+        elapsed_time = Text(root, height=grid_row_height, width=grid_box_width)
+        elapsed_time.grid(row=j, column = elapsed_time_column)
+        split_time = Text(root, height=grid_row_height, width=grid_box_width)
+        split_time.grid(row=j, column = split_time_column)
+        next = My_grid_box(root,j,4)
 
         if(current_length >= lap+1):
+            #testing length againts a_clock.split_list_peloton
             elapsed_time.insert(INSERT, a_clock.race_time_list_peloton[lap])
             split_time.insert(INSERT, a_clock.split_list_peloton[lap])
-            #print(a_clock.split_list_peloton[lap])
+            next.insert(INSERT, "Test")
             #trying to create a split_time list, should this be local or part of the clock function?
             #this_split = a_clock.split_list_peloton[int(lap)] - a_clock.split_list_peloton[int(lap) - 1]
             #split_time.insert(INSERT, this_split)
@@ -199,6 +218,7 @@ def refresh_screen():
             #fill out some null values for remaining cells
             elapsed_time.insert(INSERT, "Null")
             split_time.insert(INSERT, "Null")
+            next.insert(INSERT, "Test")
         lap += 1
 
 def make_screen():
@@ -209,7 +229,7 @@ def split_button():
     refresh_screen()
 
 def test():
-    a_clock.get_time_string(100000)
+    print(a_clock.get_time_string(100000))
 
  #Menu bar
 root = Tk()
@@ -228,28 +248,20 @@ menu.add_cascade(label="Help", menu=helpmenu)
 helpmenu.add_command(label="About...", command=About)
 
 #Grid spreadsheet
-Label(root, text="hey").grid(row=0)
-Label(root, text="you").grid(row=1)
-Label(root, text="there").grid(row=2)
 
-e1 = Entry(root)
-e2 = Entry(root)
-e3 = Entry(root)
-
-e1.grid(row=0, column=1)
-e2.grid(row=1, column=1)
-e3.grid(row=2, column=1)
 
 #output Grid
 
 
 
 #text
-#time counter is t1
-# t1 = Text(root, height=2, width=30)
-# t1.grid(row=position_clock_timer[1], column=position_clock_timer[0])
-# t1.insert(INSERT, a_clock.t.get())
-Label(root, text="Clock").grid(row=5)
+#time counter is timer_active
+# timer_active = Text(root, height=2, width=30)
+# timer_active.grid(row=position_clock_timer[1], column=position_clock_timer[0])
+# timer_active.insert(INSERT, a_clock.t.get())
+timer_label_row = configFile.getValueAsInt("positionTimerLabelRow")
+timer_label_column = configFile.getValueAsInt("positionTimerLabelColumn")
+Label(root, text="Clock").grid(row=timer_label_row, column=timer_label_column)
 
 #buttons
 Button(root, text='Quit', command=root.quit).grid(row=position_button_row, column=0, sticky=W, pady=4)
