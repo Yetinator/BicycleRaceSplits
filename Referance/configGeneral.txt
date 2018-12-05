@@ -15,4 +15,4 @@ positionSplitTimeColumn:3
 textBoxHeight:2
 textBoxWidth:30
 gridBoxHeight:1
-gridBoxWidth:15
+gridBoxWidth:10
