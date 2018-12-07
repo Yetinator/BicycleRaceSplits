@@ -8,6 +8,8 @@ import tkinter as tk
 import tkinter.filedialog
 from writeClass import *
 import time
+from stopWatchClass import SwissWatch
+from stopWatchClass import Watch
 
 global rando
 rando = 1
@@ -51,9 +53,17 @@ class AbstractWindow(ABC, tk.Tk):
         self.MakeScreen()
 
 class MyWindow(AbstractWindow, tk.Tk):
-
+    #MakeScreen > MakeButtons, MakeGrid, MakeClock (LOOP MakeClock?)
+    #update_time_stamp > MakeClock (loop timestamp in main)
     def do_something(self):
         print("I don't want to do something")
+
+    def ExitProgram(self):
+        self.quit()
+        # exit()
+        # self.destroy()
+        # self.update_idletasks()
+        # self.update()
 
     def MakeScreen(self):
         #this is called in the constructer as part of the superclass
@@ -64,20 +74,22 @@ class MyWindow(AbstractWindow, tk.Tk):
 
     def MakeButtons(self):
         #pass this to Makescreen which is called by superclass
-        Button(text='Quit', command=self.quit).grid(row=self.position_button_row, column=0, sticky=W, pady=4)
-        Button(text='Test something', command=self.do_something).grid(row=self.position_button_row, column=1, sticky=W, pady=4)
-        Button(text='Peloton Split', command=self.do_something).grid(row=self.position_button_row, column=2, sticky=W, pady=4)
-        Button(text='Start Timer', command=self.do_something).grid(row=self.position_button_row, column=3, sticky=W, pady=4)
+        Button(text='Quit', command=self.ExitProgram).grid(row=self.position_button_row, column=0, sticky=W, pady=4)
+        Button(text='Test something', command=self.test_button).grid(row=self.position_button_row, column=1, sticky=W, pady=4)
+        Button(text='Peloton Split', command=self.peloton_split_button).grid(row=self.position_button_row, column=2, sticky=W, pady=4)
+        Button(text='Start Timer', command=self.start_button).grid(row=self.position_button_row, column=3, sticky=W, pady=4)
 
     def MakeClock(self):
         #pass this to Makescreen which is called by superclass
         # global rando
         Label(text="Clock").grid(row=self.timer_label_row, column=self.timer_label_column)
-        timer_active = Text(height=self.text_box_height, width=self.text_box_width)
-        timer_active.grid(row=self.position_timer_row, column=self.position_timer_column)
-        timer_active.insert(INSERT, self.time_stamp)
+        self.timer_active = Text(height=self.text_box_height, width=self.text_box_width)
+        self.timer_active.grid(row=self.position_timer_row, column=self.position_timer_column)
+        self.timer_active.insert(INSERT, self.time_stamp)
+        # self.after(self.refresh_rate, self.MakeClock)
+        # self.timer_active.configure(text=str(self.time_stamp))
+
         # rando += 1
-        self.after(self.refresh_rate, self.MakeClock)
         # timer_active.insert(INSERT, a_clock.t.get())
 
     def MakeGrid(self):
@@ -95,6 +107,7 @@ class MyWindow(AbstractWindow, tk.Tk):
             self.MakeRow(stuff, lap)
 
             lap += 1
+
 
     def MakeLapData(self, lap_lap):
         #this should return a list of cell data for a given row or column_column
@@ -142,13 +155,89 @@ class MyWindow(AbstractWindow, tk.Tk):
 
     def update_time_stamp(self, timeStamp):
         #this is desined to accept a timestamp value from the stopwatch by way of mainloop
-        self.time_stamp = str(timeStamp)
+        self.time_stamp = (timeStamp)
+        self.MakeClock()
 
 
-    def __init__(self, *args, **kwargs):
+    def looptie_loop(self):
+        #any potential looping in this class should be limited to here, or mainloop
+        #timers = self.clockers.bazinga()
+        timers = self.clockers.get_running_time()
+        self.update_time_stamp(timers)
+        # self.update_idletasks()
+        # self.update()
+        self.after(1, self.looptie_loop)
+        #self.looptie_loop()
+
+    def start_button(self):
+        # This function is overridden in MyWindowTimer
+        print("timer started")
+
+    def peloton_split_button(self):
+        # This function is overridden in MyWindowTimer
+        print("peloton split")
+
+    def test_button(self):
+        # This function is overridden in MyWindowTimer
+        print("test button")
+
+
+    def __init__(self, clockers, *args, **kwargs):
         # tk.Tk.__init__(self, *args, **kwargs)
         self.time_stamp = ("00:00:00")
+        self.clockers = clockers
 
+        # self.time_stamp = StringVar()
+        # self.time_stamp = ("00:00:00")
+
+        #makeConfigure is just my configuration file
         self.MakeConfigure()
 
+        #MakeFileMenu
+        #Makescreen
         AbstractWindow.__init__(self, *args, **kwargs)
+        self.looptie_loop()
+
+class MyWindowTimer(MyWindow, tk.Tk):
+
+    def __init__(self, *args, **kwargs):
+
+
+        self.clockers = SwissWatch()
+        #self.clockers = Watch()
+        # self.time_stamp = StringVar()
+        # self.time_stamp = ("00:00:00")
+        MyWindow.__init__(self, self.clockers, *args, **kwargs)
+
+    # def update_time_stamp(self, timeStamp):
+    #     #this is desined to accept a timestamp value from the stopwatch by way of mainloop
+    #     self.time_stamp.set(timeStamp)
+    #     self.MakeClock()
+
+    def start_button(self):
+        self.clockers.start()
+
+    def peloton_split_button(self):
+        self.clockers.split_peloton()
+        lap = self.clockers.lap_counter
+        stuff = self.MakeLapData(lap-1)
+        self.MakeRow(stuff, lap-1)
+
+
+    def test_button(self):
+        self.MakeGrid()
+
+    def MakeLapData(self, lap_lap):
+        #this should return a list of cell data for a given row or column_column
+        #problem is this probably pulls data from main and locally
+        #there are like 4 data columns and a lap lap_counter
+        #A for loop should loop through each list and create an entry at the
+        #appropriate position.
+        if (lap_lap < len(self.clockers.race_time_list_peloton)):
+            # pelotonTime = "didn't pass"
+            pelotonTime = self.clockers.race_time_list_peloton[lap_lap]
+            pelotonSplit = self.clockers.split_list_peloton[lap_lap]
+        else:
+            pelotonTime = "Nope1"
+            pelotonSplit = "Nope2"
+        return ["Lap " + str(lap_lap), str(pelotonTime), str(pelotonSplit), "the other", "hey"]

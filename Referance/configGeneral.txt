@@ -1,7 +1,7 @@
 lapsTotal:10
 screenHeight:500
 screenWidth:500
-refreshRate:100
+refreshRate:10
 positionButtonRow:2
 positionTimerRow:2
 positionTimerLabelRow:1
