@@ -170,7 +170,7 @@ class SwissWatch:
             self.t = self.__get_time_string(sec)
             return self.t
         else:
-            return "nope"
+            return self.t
 
 
     # Local functions
