@@ -6,7 +6,6 @@ from array import *
 from writeClass import *
 from windowClass import AbstractWindow
 from windowClass import MyWindow
-from windowClass import MyWindowTimer
 from stopWatchClass import Watch
 from stopWatchClass import SwissWatch
 
@@ -27,9 +26,9 @@ def swissLoop():
     tempWindow.looptie_loop(swiss_clock)
 
 
-run = True
-swiss_clock = SwissWatch()
-tempWindow = MyWindowTimer()
+# run = True
+# swiss_clock = SwissWatch()
+tempWindow = MyWindow()
 # tempWindow2 =Tk()
 # a_clock = Watch(tempWindow)
 # a_clock.start()

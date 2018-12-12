@@ -142,16 +142,24 @@ class SwissWatch:
         #records a split in seconds from start_time for the peloton onto an list
         #total race time, lap time...
         #also must increment lap counte
-        if self.lap_counter > 0:
-            self.split_list_peloton.append(self.__get_time_int()-self.race_time_list_peloton[-1])
-        else:
-            self.split_list_peloton.append(self.__get_time_int())
-        self.race_time_list_peloton.append(self.__get_time_int())
-        self.lap_counter += 1
+        if count == 0:
+        #if running
+            if self.lap_counter > 0:
+                #if not first lap (position 0)
+                self.split_list_peloton.append(self.__get_time_int()-self.race_time_list_peloton[-1])
+            else:
+                #if it is first lap (or not not first lap)
+                self.split_list_peloton.append(self.__get_time_int())
+            self.race_time_list_peloton.append(self.__get_time_int())
+            self.lap_counter += 1
 
 
     def split_break(self):
-        pass
+        #TODO
+        if self.lap_counter > 0:
+            self.split_list_break.append(self.__get_time_int()-self.race_time_list_peloton[-1])
+        else:
+            self.split_list_break.append(self.__get_time_int())
 
     # Non-Action function
     def get_running_time(self):

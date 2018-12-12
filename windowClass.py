@@ -16,10 +16,6 @@ rando = 1
 
 class AbstractWindow(ABC, tk.Tk):
 
-    @abstractmethod
-    def do_something(self):
-        pass
-
     def NewFile(self):
         print ("New File called from super class")
     def OpenFile(self):
@@ -55,15 +51,9 @@ class AbstractWindow(ABC, tk.Tk):
 class MyWindow(AbstractWindow, tk.Tk):
     #MakeScreen > MakeButtons, MakeGrid, MakeClock (LOOP MakeClock?)
     #update_time_stamp > MakeClock (loop timestamp in main)
-    def do_something(self):
-        print("I don't want to do something")
 
     def ExitProgram(self):
         self.quit()
-        # exit()
-        # self.destroy()
-        # self.update_idletasks()
-        # self.update()
 
     def MakeScreen(self):
         #this is called in the constructer as part of the superclass
@@ -89,13 +79,16 @@ class MyWindow(AbstractWindow, tk.Tk):
         # self.after(self.refresh_rate, self.MakeClock)
         # self.timer_active.configure(text=str(self.time_stamp))
 
-        # rando += 1
-        # timer_active.insert(INSERT, a_clock.t.get())
+    def RefreshClock(self):
+        #don't forget to clear the clock
+        self.timer_active.delete(1.0, 2.0)
+        self.timer_active.insert(INSERT, self.time_stamp)
 
     def MakeGrid(self):
         #pass this to Makescreen which is called by superclass
         #This is the grid for lap times exc
-        current_length = 10#len(a_clock.split_list_peloton)
+        current_length = self.laps_total#len(a_clock.split_list_peloton)
+        #todo makegrid currently does not refresh past laps total
         self.seq_start_row_for_grid = self.position_grid_row_start
         lap = 0
         stuff = ["this", "that", "the Other"]
@@ -115,7 +108,17 @@ class MyWindow(AbstractWindow, tk.Tk):
         #there are like 4 data columns and a lap lap_counter
         #A for loop should loop through each list and create an entry at the
         #appropriate position.
-        return ["Lap " + str(lap_lap), "this", "that", "the other", "hey"]
+        if (lap_lap < len(self.clockers.race_time_list_peloton)):
+            # pelotonTime = "didn't pass"
+            pelotonTime = self.clockers.race_time_list_peloton[lap_lap]
+            pelotonSplit = self.clockers.split_list_peloton[lap_lap]
+            #breakSplit = self.clockers.split_list_break[lap_lap]
+            breakSplit = "OK"
+        else:
+            pelotonTime = "Nope1"
+            pelotonSplit = "Nope2"
+            breakSplit = "Nope3"
+        return ["Lap " + str(lap_lap + 1), str(pelotonTime), str(pelotonSplit), str(breakSplit), "hey"]
 
     def MakeRow(self, input_list, lap_lap):
         #Makes one row. This could be called with MakeGrid or without
@@ -156,7 +159,7 @@ class MyWindow(AbstractWindow, tk.Tk):
     def update_time_stamp(self, timeStamp):
         #this is desined to accept a timestamp value from the stopwatch by way of mainloop
         self.time_stamp = (timeStamp)
-        self.MakeClock()
+        self.RefreshClock()
 
 
     def looptie_loop(self):
@@ -170,22 +173,22 @@ class MyWindow(AbstractWindow, tk.Tk):
         #self.looptie_loop()
 
     def start_button(self):
-        # This function is overridden in MyWindowTimer
-        print("timer started")
+        self.clockers.start()
 
     def peloton_split_button(self):
-        # This function is overridden in MyWindowTimer
-        print("peloton split")
+        self.clockers.split_peloton()
+        lap = self.clockers.lap_counter
+        stuff = self.MakeLapData(lap-1)
+        self.MakeRow(stuff, lap-1)
 
     def test_button(self):
-        # This function is overridden in MyWindowTimer
-        print("test button")
+        self.MakeGrid()
 
 
-    def __init__(self, clockers, *args, **kwargs):
+    def __init__(self, *args, **kwargs):
         # tk.Tk.__init__(self, *args, **kwargs)
         self.time_stamp = ("00:00:00")
-        self.clockers = clockers
+        self.clockers = SwissWatch()
 
         # self.time_stamp = StringVar()
         # self.time_stamp = ("00:00:00")
@@ -197,47 +200,3 @@ class MyWindow(AbstractWindow, tk.Tk):
         #Makescreen
         AbstractWindow.__init__(self, *args, **kwargs)
         self.looptie_loop()
-
-class MyWindowTimer(MyWindow, tk.Tk):
-
-    def __init__(self, *args, **kwargs):
-
-
-        self.clockers = SwissWatch()
-        #self.clockers = Watch()
-        # self.time_stamp = StringVar()
-        # self.time_stamp = ("00:00:00")
-        MyWindow.__init__(self, self.clockers, *args, **kwargs)
-
-    # def update_time_stamp(self, timeStamp):
-    #     #this is desined to accept a timestamp value from the stopwatch by way of mainloop
-    #     self.time_stamp.set(timeStamp)
-    #     self.MakeClock()
-
-    def start_button(self):
-        self.clockers.start()
-
-    def peloton_split_button(self):
-        self.clockers.split_peloton()
-        lap = self.clockers.lap_counter
-        stuff = self.MakeLapData(lap-1)
-        self.MakeRow(stuff, lap-1)
-
-
-    def test_button(self):
-        self.MakeGrid()
-
-    def MakeLapData(self, lap_lap):
-        #this should return a list of cell data for a given row or column_column
-        #problem is this probably pulls data from main and locally
-        #there are like 4 data columns and a lap lap_counter
-        #A for loop should loop through each list and create an entry at the
-        #appropriate position.
-        if (lap_lap < len(self.clockers.race_time_list_peloton)):
-            # pelotonTime = "didn't pass"
-            pelotonTime = self.clockers.race_time_list_peloton[lap_lap]
-            pelotonSplit = self.clockers.split_list_peloton[lap_lap]
-        else:
-            pelotonTime = "Nope1"
-            pelotonSplit = "Nope2"
-        return ["Lap " + str(lap_lap), str(pelotonTime), str(pelotonSplit), "the other", "hey"]
