@@ -9,7 +9,6 @@ import tkinter.filedialog
 from writeClass import *
 import time
 from stopWatchClass import SwissWatch
-from stopWatchClass import Watch
 
 global rando
 rando = 1

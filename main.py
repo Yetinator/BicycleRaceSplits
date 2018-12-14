@@ -6,7 +6,6 @@ from array import *
 from writeClass import *
 from windowClass import AbstractWindow
 from windowClass import MyWindow
-from stopWatchClass import Watch
 from stopWatchClass import SwissWatch
 
 

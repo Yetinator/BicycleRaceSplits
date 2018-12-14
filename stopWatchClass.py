@@ -7,127 +7,14 @@ from writeClass import *
 
 
 global count
+#count is a yes/no on counter on
 count = 0
 refresh_rate=100
 
-class Watch:
-    def reset(self):
-        #This probably shouldn't work?
-        #similar conscepts include, start new watch instance,
-        #false start, create new start point
-        #end the race - covered by stop function
-        global count
-        count=1
-#orginal
-    def start(self):
-        global count
-        if count == 0:
-            self.start_time = time.time()
-        count=0
-        self.start_timer()
-#orginal
-    def start_timer(self):
-        global count
-        self.timer()
 
-        #orginal
-    def stop(self):
-        global count
-        count=1
-
-    def timer(self):
-        #This is going to go away
-        #this timer stores as a string, but should store as a number
-        global count
-        if(count==0):
-            self.time_read = time.time()
-            sec = int(self.time_read - self.start_time)
-            self.t.set(self.get_time_string(sec))
-            #loop the timer
-            if(count==0):
-                self.root.after(refresh_rate, self.start_timer)
-
-    def split_peloton(self):
-        #records a split in seconds from start_time for the peloton onto an list
-        #total race time, lap time...
-        #also must increment lap counter
-        if self.lap_counter > 0:
-            self.split_list_peloton.append(self.get_race_time_current()-self.race_time_list_peloton[-1])
-        else:
-            self.split_list_peloton.append(self.get_race_time_current())
-        self.race_time_list_peloton.append(self.get_race_time_current())
-        self.lap_counter += 1
-
-    def get_time_string(self, time_number):
-        time_string = str(time_number)
-        h = int(time_number)//3600
-        time_number = time_number % 3600
-        m = int(time_number)//60
-        time_number = time_number % 60
-        s = int(time_number)
-        #convert to string
-        if(h<10):
-            h = str(0) + str(h)
-        else:
-            h= str(h)
-        if(m<10):
-            m = str(0) + str(m)
-        else:
-            m = str(m)
-        if(s<10):
-            s=str(0) +str(s)
-        else:
-            s=str(s)
-        #self.d= h + ":" + m + ":" + s
-        return str(h) + ":" + str(m) + ":" + str(s)
-
-    def get_time_int(self):
-        return(1000)
-
-    def get_race_time_current(self):
-        now = time.time()
-        then = self.start_time
-        return(int(now - then))
-
-    #def get_lap_time(self):
-        #needs to handle peloton or break away
-        #this lap minus last lap
-
-#orginal
-    def split_break(self):
-        #records a split of a break onto an array for breaks
-        #assigns lap based on lap counter
-        pass
-
-    def get_t_time(self):
-        #this is designed to be called by main to be passed into the view
-        return str(self.t)
-
-    def __init__(self, root):
-        self.root=root
-
-        #single variables
-        self.time_read = time.time()
-        self.start_time = time.time()
-        self.lap_counter = 0
-        #self.t should represent the string value of the current time at all times
-        self.t = StringVar()
-        self.t.set("00:00:00")
-
-        #split lists may be changed to tuples?
-        self.race_time_list_peloton = []
-        self.split_list_peloton = []
-        self.split_list_break = []
-
-
-            #continue
 class SwissWatch:
     #This should only pass values, no actual looping in the SwissWatch
     #looping handled by calling class or method
-    def bazinga(self):
-        self.bazingaCounter = self.bazingaCounter + 1
-        return str(self.bazingaCounter)
-
     def start(self):
         global count
         if count == 1:
@@ -146,12 +33,16 @@ class SwissWatch:
         #if running
             if self.lap_counter > 0:
                 #if not first lap (position 0)
-                self.split_list_peloton.append(self.__get_time_int()-self.race_time_list_peloton[-1])
+                # self.split_list_peloton.append(self.__get_time_int()-self.race_time_list_peloton[-1])
+                self.lap_datas[self.lap_counter].time_peloton()
             else:
+                pass
                 #if it is first lap (or not not first lap)
-                self.split_list_peloton.append(self.__get_time_int())
-            self.race_time_list_peloton.append(self.__get_time_int())
+            #     self.split_list_peloton.append(self.__get_time_int())
+            # self.race_time_list_peloton.append(self.__get_time_int())
+            #increment lap and lap list
             self.lap_counter += 1
+            self.lap_datas.append(self.lap_counter,previouslap,starttime)
 
 
     def split_break(self):
@@ -215,12 +106,62 @@ class SwissWatch:
         self.time_read = time.time()
         self.start_time = time.time()
         self.lap_counter = 0
-        self.bazingaCounter = 0
         #self.t should represent the string value of the current time at all times
         self.t = ""
         #self.t = string
         self.t = ("00:00:00")
         #split lists may be changed to tuples?
-        self.race_time_list_peloton = []
-        self.split_list_peloton = []
-        self.split_list_break = []
+        # self.race_time_list_peloton = []
+        # self.split_list_peloton = []
+        # self.split_list_break = []
+
+        self.lap_datas = [LapData(0,0,self.start_time)]
+
+class LapData:
+
+    # @classproperty
+    # cls.current_lap = 0
+
+
+    @property
+    def time_peloton(self):
+        if self.time_peloton != 0:
+            return str(self.time_peloton)
+        else:
+            return "Nope"
+    # def get_int_time_peloton(self):
+    #     #this function should only be called when a number is needed
+    #     return self.time_peloton
+
+    @time_peloton.setter
+    def time_peloton(self,itime):
+        #This function should be called by peloton split button
+        self.time_peloton = time.time() - self.start_time
+        # self.__set_split_peloton()
+
+    @property
+    def split_peloton(self):
+        return self.split_peloton
+
+    @split_peloton.setter
+    def split_peloton(self):
+        self.split_peloton = self.time_peloton - self.time_previous_lap
+
+
+    def __init__(self, lap_lap, previousLapTime, start):
+        self.start_time = int(start)
+        self.lap_number = int(lap_lap)
+        self.time_previous_lap = int(previousLapTime)
+        #lap length in meters, but don't refer to this directly. Use a function so meters can be ditched
+        self.lap_length = 1600
+
+        #as strings to be updated to cool stuff
+        #elapsed time for the lap is: time_peloton
+        self.time_peloton = 0
+        self.times_break = [0]
+        self.split_peloton = "None"
+        self.splits_break = ["None"]
+        self.speed_peloton = "None"
+        self.speeds_break = ["None"]
+        self.break_lead_out = ["None"]
+        # self.split_peloton = "None"
