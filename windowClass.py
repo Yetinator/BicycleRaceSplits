@@ -107,10 +107,12 @@ class MyWindow(AbstractWindow, tk.Tk):
         #there are like 4 data columns and a lap lap_counter
         #A for loop should loop through each list and create an entry at the
         #appropriate position.
-        if (lap_lap < len(self.clockers.race_time_list_peloton)):
+        if (lap_lap < len(self.clockers.lap_datas)):
+        # if True:
             # pelotonTime = "didn't pass"
-            pelotonTime = self.clockers.race_time_list_peloton[lap_lap]
-            pelotonSplit = self.clockers.split_list_peloton[lap_lap]
+            print(lap_lap)
+            pelotonTime = self.clockers.race_time_list_peloton
+            pelotonSplit = self.clockers.split_list_peloton(lap_lap)
             #breakSplit = self.clockers.split_list_break[lap_lap]
             breakSplit = "OK"
         else:

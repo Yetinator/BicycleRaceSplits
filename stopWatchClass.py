@@ -34,7 +34,7 @@ class SwissWatch:
             if self.lap_counter > 0:
                 #if not first lap (position 0)
                 # self.split_list_peloton.append(self.__get_time_int()-self.race_time_list_peloton[-1])
-                self.lap_datas[self.lap_counter].time_peloton()
+                self.lap_datas[self.lap_counter].button_peloton()
             else:
                 pass
                 #if it is first lap (or not not first lap)
@@ -97,6 +97,17 @@ class SwissWatch:
         else:
             return None
 
+    @property
+    def race_time_list_peloton(self, lap_lap):
+
+        this = self.lap_datas[0]
+        print(this.time_peloton)
+        return 10
+
+    @property
+    def split_list_peloton(self, lappy_lap):
+        return self.lap_datas[lappy_lap].split_peloton
+
 
 
     def __init__(self):
@@ -115,7 +126,10 @@ class SwissWatch:
         # self.split_list_peloton = []
         # self.split_list_break = []
 
-        self.lap_datas = [LapData(0,0,self.start_time)]
+        # self.lap_datas = [LapData(0,0,self.start_time), LapData(1,0,self.start_time)]
+        this = LapData(0,0,self.start_time)
+        self.lap_datas = [this]
+        # print(help(self.lap_datas))
 
 class LapData:
 
@@ -123,32 +137,39 @@ class LapData:
     # cls.current_lap = 0
 
 
-    @property
-    def time_peloton(self):
-        if self.time_peloton != 0:
-            return str(self.time_peloton)
-        else:
-            return "Nope"
-    # def get_int_time_peloton(self):
-    #     #this function should only be called when a number is needed
-    #     return self.time_peloton
+    # @property
+    # def time_peloton(self):
+    #     if self.time_peloton != 0:
+    #         return str(self.time_peloton)
+    #     else:
+    #         return "Nope"
+    # # def get_int_time_peloton(self):
+    # #     #this function should only be called when a number is needed
+    # #     return self.time_peloton
+    #
+    # @time_peloton.setter
+    # def time_peloton(self,itime):
+    #     #This function should be called by peloton split button
+    #     self.time_peloton = time.time() - self.start_time
+    #     # self.__set_split_peloton()
+    #
+    # @property
+    # def split_peloton(self):
+    #     return self.split_peloton
+    #
+    # @split_peloton.setter
+    # def split_peloton(self):
+    #     self.split_peloton = self.time_peloton - self.time_previous_lap
+    def button_peloton(self):
+        #this should record the peloton race time, split time, create a new lap or increment
+        if True:
+            #Todo, if time_peloton isn't already set
+            self.time_peloton = time.time()
 
-    @time_peloton.setter
-    def time_peloton(self,itime):
-        #This function should be called by peloton split button
-        self.time_peloton = time.time() - self.start_time
-        # self.__set_split_peloton()
-
-    @property
-    def split_peloton(self):
-        return self.split_peloton
-
-    @split_peloton.setter
-    def split_peloton(self):
-        self.split_peloton = self.time_peloton - self.time_previous_lap
 
 
     def __init__(self, lap_lap, previousLapTime, start):
+        print("starting thingy")
         self.start_time = int(start)
         self.lap_number = int(lap_lap)
         self.time_previous_lap = int(previousLapTime)
@@ -157,9 +178,9 @@ class LapData:
 
         #as strings to be updated to cool stuff
         #elapsed time for the lap is: time_peloton
-        self.time_peloton = 0
+        self.time_peloton = 0 #the time is the race time of the peloton
         self.times_break = [0]
-        self.split_peloton = "None"
+        self.split_peloton = "None" # the split is the difference in lap times
         self.splits_break = ["None"]
         self.speed_peloton = "None"
         self.speeds_break = ["None"]
