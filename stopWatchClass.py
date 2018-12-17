@@ -31,26 +31,24 @@ class SwissWatch:
         #also must increment lap counte
         if count == 0:
         #if running
-            if self.lap_counter > 0:
+            if LapData.current_lap > 0:
                 #if not first lap (position 0)
                 # self.split_list_peloton.append(self.__get_time_int()-self.race_time_list_peloton[-1])
-                self.lap_datas[self.lap_counter].button_peloton()
+                self.lap_datas[LapData.current_lap-1].button_peloton()
             else:
-                pass
-                #if it is first lap (or not not first lap)
-            #     self.split_list_peloton.append(self.__get_time_int())
-            # self.race_time_list_peloton.append(self.__get_time_int())
-            #increment lap and lap list
-            self.lap_counter += 1
-            self.lap_datas.append(self.lap_counter,previouslap,starttime)
+                print("split_peloton - shouldn't be here")
 
+            self.lap_datas.append(LapData())
 
     def split_break(self):
         #TODO
-        if self.lap_counter > 0:
-            self.split_list_break.append(self.__get_time_int()-self.race_time_list_peloton[-1])
+        if LapData.current_lap > 0:
+            pass
+            # self.split_list_break.append(self.__get_time_int()-self.race_time_list_peloton[-1])
+
         else:
-            self.split_list_break.append(self.__get_time_int())
+            pass
+            # self.split_list_break.append(self.__get_time_int())
 
     # Non-Action function
     def get_running_time(self):
@@ -63,6 +61,21 @@ class SwissWatch:
         else:
             return self.t
 
+    # def get_lap_data(self):
+    #     lap = LapData.current_lap
+    #     return get_lap_data(lap)
+
+    def get_lap_data(self, lap = None):
+        if lap == None:
+            lap = LapData.current_lap
+            print("Getting lap data current lap?")
+        #This feeds a row of data to the frontend
+        #some of requested laps will be beyond the list
+        # return ["Lap " + str(lap_lap + 1), str(pelotonTime), str(pelotonSplit), str(breakSplit), "hey"]
+        if lap < LapData.current_lap:
+            return ["Lap " + str(lap + 1), str(LapData.time_peloton[lap]), str("there"), str("what"), "hey"]
+        else:
+            return ["Lap " + str(lap + 1), str("or else"), str("there"), str("what"), "hey"]
 
     # Local functions
     def __get_time_string(self, time_number):
@@ -88,6 +101,10 @@ class SwissWatch:
         #self.d= h + ":" + m + ":" + s
         return str(h) + ":" + str(m) + ":" + str(s)
 
+    @property
+    def current_lap(self):
+        return LapData.current_lap
+
     def __get_time_int(self):
         global count
         if(count==0):
@@ -108,7 +125,12 @@ class SwissWatch:
     def split_list_peloton(self, lappy_lap):
         return self.lap_datas[lappy_lap].split_peloton
 
-
+    def test_button(self):
+        print("Stopwatchclass test function:::")
+        print(self.t)
+        print(self.lap_datas[0].time_peloton)
+        for i in self.lap_datas:
+            print(i.lap_number)
 
     def __init__(self):
         #single variables
@@ -116,69 +138,72 @@ class SwissWatch:
         count = 1
         self.time_read = time.time()
         self.start_time = time.time()
-        self.lap_counter = 0
+
+        #lap_counter becomes LapData.current_lap?
+        # LapData.current_lap = 0
         #self.t should represent the string value of the current time at all times
         self.t = ""
         #self.t = string
         self.t = ("00:00:00")
+        self.lap_datas = [LapData(self.start_time)]
         #split lists may be changed to tuples?
         # self.race_time_list_peloton = []
         # self.split_list_peloton = []
         # self.split_list_break = []
 
         # self.lap_datas = [LapData(0,0,self.start_time), LapData(1,0,self.start_time)]
-        this = LapData(0,0,self.start_time)
-        self.lap_datas = [this]
+        # this = LapData(0,0,self.start_time)
+        # self.lap_datas = [this]
         # print(help(self.lap_datas))
 
 class LapData:
 
     # @classproperty
-    # cls.current_lap = 0
+    #accessed LapData.current_lap
+    current_lap = 0
+    #lap length in meters, but don't refer to this directly. Use a function so meters can be ditched
+    lap_length = 1600
+    time_peloton = []
+    start_time = 0
 
-
-    # @property
-    # def time_peloton(self):
-    #     if self.time_peloton != 0:
-    #         return str(self.time_peloton)
-    #     else:
-    #         return "Nope"
-    # # def get_int_time_peloton(self):
-    # #     #this function should only be called when a number is needed
-    # #     return self.time_peloton
-    #
-    # @time_peloton.setter
-    # def time_peloton(self,itime):
-    #     #This function should be called by peloton split button
-    #     self.time_peloton = time.time() - self.start_time
-    #     # self.__set_split_peloton()
-    #
-    # @property
-    # def split_peloton(self):
-    #     return self.split_peloton
-    #
-    # @split_peloton.setter
-    # def split_peloton(self):
-    #     self.split_peloton = self.time_peloton - self.time_previous_lap
     def button_peloton(self):
         #this should record the peloton race time, split time, create a new lap or increment
         if True:
             #Todo, if time_peloton isn't already set
-            self.time_peloton = time.time()
+            print(str(time.time()-LapData.start_time)+" is the running time?")
+            LapData.time_peloton[LapData.current_lap - 1] = time.time()-LapData.start_time
 
+    # @classmethod
+    # def laps_init(cls ,start):
+    #     #This should behave as an alternate constructer
+    #     LapData.start_time = int(start)
+    #     cls.__init__()
 
+    def __init__(self, start=None):
+        #todo - make certain things a class variable.  LapData.Time_peloton[]
+        #gives better access to all of that than having a single instance listed under
+        #a particular lap
+        #other Class Variables lap_length, current lap, start_time
+        if start is not None:
+            if LapData.start_time == 0:
+                LapData.start_time = start
+        elif  LapData.start_time == 0:
+            LapData.start_time = time.time()
+        # print("starting thingy")
+        # print("start time is " + str(LapData.start_time))
+        self.lap_number = int(LapData.current_lap)
+        print("current_lap = " + str(LapData.current_lap))
 
-    def __init__(self, lap_lap, previousLapTime, start):
-        print("starting thingy")
-        self.start_time = int(start)
-        self.lap_number = int(lap_lap)
-        self.time_previous_lap = int(previousLapTime)
-        #lap length in meters, but don't refer to this directly. Use a function so meters can be ditched
-        self.lap_length = 1600
+        #in the constructor, previous lap is always the last lap created
+        # if LapData.current_lap > 1:
+        #     self.time_previous_lap = LapData.time_peloton[self.lap_number - 1]
+
 
         #as strings to be updated to cool stuff
         #elapsed time for the lap is: time_peloton
-        self.time_peloton = 0 #the time is the race time of the peloton
+        # self.time_peloton = 0 #the time is the race time of the peloton
+        LapData.time_peloton.append("Inti append " + str(LapData.current_lap))
+        # LapData.time_peloton.append("None2")
         self.times_break = [0]
         self.split_peloton = "None" # the split is the difference in lap times
         self.splits_break = ["None"]
@@ -186,3 +211,4 @@ class LapData:
         self.speeds_break = ["None"]
         self.break_lead_out = ["None"]
         # self.split_peloton = "None"
+        LapData.current_lap = LapData.current_lap + 1

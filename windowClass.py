@@ -95,18 +95,21 @@ class MyWindow(AbstractWindow, tk.Tk):
         #for j in range(begining row of grid, end row of grid)
         for j in range(self.seq_start_row_for_grid, self.laps_total + self.seq_start_row_for_grid):
             #the input list "Stuff" will have to update with j to reflect the associated lists for time stats
-            stuff = self.MakeLapData(lap)
+            # stuff = self.MakeLapData(lap)
+            stuff = self.clockers.get_lap_data(lap)
             self.MakeRow(stuff, lap)
 
             lap += 1
 
 
     def MakeLapData(self, lap_lap):
+        #depreciated
         #this should return a list of cell data for a given row or column_column
         #problem is this probably pulls data from main and locally
         #there are like 4 data columns and a lap lap_counter
         #A for loop should loop through each list and create an entry at the
         #appropriate position.
+        #I probablyshould move this function to StopwatchClass
         if (lap_lap < len(self.clockers.lap_datas)):
         # if True:
             # pelotonTime = "didn't pass"
@@ -121,8 +124,10 @@ class MyWindow(AbstractWindow, tk.Tk):
             breakSplit = "Nope3"
         return ["Lap " + str(lap_lap + 1), str(pelotonTime), str(pelotonSplit), str(breakSplit), "hey"]
 
-    def MakeRow(self, input_list, lap_lap):
+    def MakeRow(self, input_list, lap_lap = None):
         #Makes one row. This could be called with MakeGrid or without
+        if lap_lap == None:
+            lap_lap = self.clockers.current_lap
         for aColumn in range(len(input_list)):
             input_input = input_list[aColumn]
             self.MakeCell(input_input, lap_lap, aColumn)
@@ -178,11 +183,13 @@ class MyWindow(AbstractWindow, tk.Tk):
 
     def peloton_split_button(self):
         self.clockers.split_peloton()
-        lap = self.clockers.lap_counter
-        stuff = self.MakeLapData(lap-1)
-        self.MakeRow(stuff, lap-1)
+        # lap = self.clockers.LapData.current_lap
+        stuff = self.clockers.get_lap_data()
+        # self.MakeRow(stuff, lap)
+        self.MakeRow(stuff)
 
     def test_button(self):
+        self.clockers.test_button()
         self.MakeGrid()
 
 
