@@ -9,7 +9,6 @@ import tkinter.filedialog
 from writeClass import *
 import time
 from stopWatchClass import SwissWatch
-from stopWatchClass import Watch
 
 global rando
 rando = 1
@@ -67,7 +66,8 @@ class MyWindow(AbstractWindow, tk.Tk):
         Button(text='Quit', command=self.ExitProgram).grid(row=self.position_button_row, column=0, sticky=W, pady=4)
         Button(text='Test something', command=self.test_button).grid(row=self.position_button_row, column=1, sticky=W, pady=4)
         Button(text='Peloton Split', command=self.peloton_split_button).grid(row=self.position_button_row, column=2, sticky=W, pady=4)
-        Button(text='Start Timer', command=self.start_button).grid(row=self.position_button_row, column=3, sticky=W, pady=4)
+        Button(text='Breakaway Split', command=self.breakaway_split_button).grid(row=self.position_button_row, column=3, sticky=W, pady=4)
+        Button(text='Start Timer', command=self.start_button).grid(row=self.position_button_row, column=4, sticky=W, pady=4)
 
     def MakeClock(self):
         #pass this to Makescreen which is called by superclass
@@ -87,48 +87,52 @@ class MyWindow(AbstractWindow, tk.Tk):
     def MakeGrid(self):
         #pass this to Makescreen which is called by superclass
         #This is the grid for lap times exc
+        #todo, this function refreshes only to the laps written into config file
         current_length = self.laps_total#len(a_clock.split_list_peloton)
         #todo makegrid currently does not refresh past laps total
         self.seq_start_row_for_grid = self.position_grid_row_start
-        lap = 0
+                                        # self.position_grid_row_label
+
+        self.MakeGridLabels()
+
+        lap_index = 0
         stuff = ["this", "that", "the Other"]
         #A loop that populates the splits grid
         #for j in range(begining row of grid, end row of grid)
         for j in range(self.seq_start_row_for_grid, self.laps_total + self.seq_start_row_for_grid):
             #the input list "Stuff" will have to update with j to reflect the associated lists for time stats
-            stuff = self.MakeLapData(lap)
-            self.MakeRow(stuff, lap)
+            # stuff = self.MakeLapData(lap)
+            stuff = self.clockers.get_lap_data(lap_index)
+            self.MakeRow(stuff, lap_index)
 
-            lap += 1
+            lap_index += 1
 
+    def MakeGridLabels(self):
+        # get a list of labels
+        labels = self.clockers.get_lap_labels()
 
-    def MakeLapData(self, lap_lap):
-        #this should return a list of cell data for a given row or column_column
-        #problem is this probably pulls data from main and locally
-        #there are like 4 data columns and a lap lap_counter
-        #A for loop should loop through each list and create an entry at the
-        #appropriate position.
-        if (lap_lap < len(self.clockers.race_time_list_peloton)):
-            # pelotonTime = "didn't pass"
-            pelotonTime = self.clockers.race_time_list_peloton[lap_lap]
-            pelotonSplit = self.clockers.split_list_peloton[lap_lap]
-            #breakSplit = self.clockers.split_list_break[lap_lap]
-            breakSplit = "OK"
-        else:
-            pelotonTime = "Nope1"
-            pelotonSplit = "Nope2"
-            breakSplit = "Nope3"
-        return ["Lap " + str(lap_lap + 1), str(pelotonTime), str(pelotonSplit), str(breakSplit), "hey"]
+        # find where they go
+        this_label_row = self.position_grid_row_label
 
-    def MakeRow(self, input_list, lap_lap):
+        # write the row of labels similar to MakeRow > MakeCell
+        for label in labels:
+            column_column = labels.index(label)
+            Label(text = label, height=self.grid_row_height, width=self.grid_box_width).grid(row=this_label_row, column = column_column)
+        # self.MakeRow(labels, self.position_grid_row_label)
+
+    def MakeRow(self, input_list, lap_lap = None):
         #Makes one row. This could be called with MakeGrid or without
+        if lap_lap == None:
+            lap_lap = self.clockers.current_lap_index
+        #a_column represents one data item in a list of strings
         for aColumn in range(len(input_list)):
+            # this loop creates a cell for each item in the list
             input_input = input_list[aColumn]
             self.MakeCell(input_input, lap_lap, aColumn)
 
     def MakeCell(self, input_input, lap_lap, column_column):
         #called by MakeRow
-        cellRow = lap_lap +self.seq_start_row_for_grid
+        cellRow = lap_lap + self.seq_start_row_for_grid
         Label(text = input_input, height=self.grid_row_height, width=self.grid_box_width).grid(row=cellRow, column = column_column)
 
     def MakeConfigure(self):
@@ -145,6 +149,7 @@ class MyWindow(AbstractWindow, tk.Tk):
         self.text_box_width = configFile.getValueAsInt("textBoxWidth")
         self.laps_total = configFile.getValueAsInt("lapsTotal")
         self.position_grid_row_start = configFile.getValueAsInt("positionGridDataRow")
+        self.position_grid_row_label = configFile.getValueAsInt("positionGridLabelRow")
         self.text_box_height = configFile.getValueAsInt("textBoxHeight")
         self.position_timer_row = configFile.getValueAsInt("positionTimerRow")
         self.position_timer_column = configFile.getValueAsInt("positionTimerColumn")
@@ -177,11 +182,22 @@ class MyWindow(AbstractWindow, tk.Tk):
 
     def peloton_split_button(self):
         self.clockers.split_peloton()
-        lap = self.clockers.lap_counter
-        stuff = self.MakeLapData(lap-1)
-        self.MakeRow(stuff, lap-1)
+        # lap = self.clockers.LapData.current_lap
+        stuff = self.clockers.get_lap_data()
+        # self.MakeRow(stuff, lap)
+        self.MakeRow(stuff, self.clockers.current_lap_index - 1)
+        #this needs to be current_lap_index - 1 because the lap increments just before makerow is called.
+        #because the next lap is made before we are even saving information to it, this makes us ahead of the index
+
+    def breakaway_split_button(self):
+        self.clockers.split_break()
+        stuff = self.clockers.get_lap_data()
+        self.MakeRow(stuff, self.clockers.current_lap_index - 1)
+        #this needs to be current_lap_index - 1 because the lap increments just before makerow is called.
+        #because the next lap is made before we are even saving information to it, this makes us ahead of the index
 
     def test_button(self):
+        # self.clockers.test_button()
         self.MakeGrid()
 
 
