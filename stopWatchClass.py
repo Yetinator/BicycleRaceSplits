@@ -6,9 +6,9 @@ from writeClass import *
 
 
 
-global count
-#count is a yes/no on counter on
-count = 0
+global clock_running
+#clock_running is a yes/no on counter on
+clock_running = 0
 refresh_rate=100
 
 
@@ -16,10 +16,11 @@ class SwissWatch:
     #This should only pass values, no actual looping in the SwissWatch
     #looping handled by calling class or method
     def start(self):
-        global count
-        if count == 1:
-            self.start_time = time.time()
-        count=0
+        global clock_running
+        if clock_running == 1:
+            # self.start_time = time.time()
+            LapData.set_start_time()
+        clock_running=0
         self.get_running_time()
 
     def stop(self):
@@ -29,7 +30,7 @@ class SwissWatch:
         #records a split in seconds from start_time for the peloton onto an list
         #total race time, lap time...
         #also must increment lap counte
-        if count == 0:
+        if clock_running == 0:
         #if running
             if LapData.current_lap > 0:
                 #if not first lap (position 0)
@@ -52,10 +53,10 @@ class SwissWatch:
 
     # Non-Action function
     def get_running_time(self):
-        global count
-        if(count==0):
+        global clock_running
+        if(clock_running==0):
             self.time_read = time.time()
-            sec = int(self.time_read - self.start_time)
+            sec = int(self.time_read - LapData.get_start_time())
             self.t = self.__get_time_string(sec)
             return self.t
         else:
@@ -65,17 +66,19 @@ class SwissWatch:
     #     lap = LapData.current_lap
     #     return get_lap_data(lap)
 
-    def get_lap_data(self, lap = None):
-        if lap == None:
-            lap = LapData.current_lap
-            print("Getting lap data current lap?")
+    def get_lap_data(self, lap_index = None):
+        if lap_index == None:
+            #minus 2 seems weird.  why is this minus 2?
+            #when I hit split_peloton in windowClass, I am incrementing the lap.  I am also creating 1 lap ahead, so breakaways are ready to be logged
+            lap_index = LapData.current_lap - 2
+            print("Getting lap_index data current lap_index? " + str(lap_index))
         #This feeds a row of data to the frontend
         #some of requested laps will be beyond the list
-        # return ["Lap " + str(lap_lap + 1), str(pelotonTime), str(pelotonSplit), str(breakSplit), "hey"]
-        if lap < LapData.current_lap:
-            return ["Lap " + str(lap + 1), str(LapData.time_peloton[lap]), str("there"), str("what"), "hey"]
+        # return ["lap_index " + str(lap_lap + 1), str(pelotonTime), str(pelotonSplit), str(breakSplit), "hey"]
+        if lap_index < LapData.current_lap:
+            return ["lap " + str(lap_index + 1), str(LapData.time_peloton[lap_index]), str(self.lap_datas[lap_index].split_peloton), str("what"), "hey"]
         else:
-            return ["Lap " + str(lap + 1), str("or else"), str("there"), str("what"), "hey"]
+            return ["lap " + str(lap_index + 1), str("or else"), str("there"), str("what"), "hey"]
 
     # Local functions
     def __get_time_string(self, time_number):
@@ -103,23 +106,30 @@ class SwissWatch:
 
     @property
     def current_lap(self):
+        #lap starts with 1
+        print("lap is " + str(LapData.current_lap))
         return LapData.current_lap
 
+    @property
+    def current_lap_index(self):
+        #index starts with 0
+        return LapData.current_lap - 1
+
     def __get_time_int(self):
-        global count
-        if(count==0):
+        global clock_running
+        if(clock_running==0):
             self.time_read = time.time()
-            sec = int(self.time_read - self.start_time)
+            sec = int(self.time_read - LapData.get_start_time())
             return sec
         else:
             return None
-
-    @property
-    def race_time_list_peloton(self, lap_lap):
-
-        this = self.lap_datas[0]
-        print(this.time_peloton)
-        return 10
+    #
+    # @property
+    # def race_time_list_peloton(self, lap_lap):
+    #
+    #     this = self.lap_datas[0]
+    #     print(this.time_peloton)
+    #     return 10
 
     @property
     def split_list_peloton(self, lappy_lap):
@@ -134,10 +144,10 @@ class SwissWatch:
 
     def __init__(self):
         #single variables
-        global count
-        count = 1
+        global clock_running
+        clock_running = 1
         self.time_read = time.time()
-        self.start_time = time.time()
+        # self.start_time = time.time()
 
         #lap_counter becomes LapData.current_lap?
         # LapData.current_lap = 0
@@ -145,7 +155,7 @@ class SwissWatch:
         self.t = ""
         #self.t = string
         self.t = ("00:00:00")
-        self.lap_datas = [LapData(self.start_time)]
+        self.lap_datas = [LapData()]
         #split lists may be changed to tuples?
         # self.race_time_list_peloton = []
         # self.split_list_peloton = []
@@ -171,13 +181,23 @@ class LapData:
         if True:
             #Todo, if time_peloton isn't already set
             print(str(time.time()-LapData.start_time)+" is the running time?")
-            LapData.time_peloton[LapData.current_lap - 1] = time.time()-LapData.start_time
+            LapData.time_peloton[LapData.current_lap - 1] = int(time.time()-LapData.start_time)
+            self.split_peloton = LapData.time_peloton[LapData.current_lap - 1] - LapData.time_peloton[LapData.current_lap - 2]
 
     # @classmethod
     # def laps_init(cls ,start):
     #     #This should behave as an alternate constructer
     #     LapData.start_time = int(start)
     #     cls.__init__()
+
+    @classmethod
+    def set_start_time(cls):
+        cls.start_time = time.time()
+        print("setting start time in LapData " + str(cls.start_time))
+
+    @classmethod
+    def get_start_time(cls):
+        return cls.start_time
 
     def __init__(self, start=None):
         #todo - make certain things a class variable.  LapData.Time_peloton[]
@@ -205,7 +225,7 @@ class LapData:
         LapData.time_peloton.append("Inti append " + str(LapData.current_lap))
         # LapData.time_peloton.append("None2")
         self.times_break = [0]
-        self.split_peloton = "None" # the split is the difference in lap times
+        self.split_peloton = "None1" # the split is the difference in lap times
         self.splits_break = ["None"]
         self.speed_peloton = "None"
         self.speeds_break = ["None"]
