@@ -36,6 +36,7 @@ class SwissWatch:
                 #if not first lap (position 0)
                 # self.split_list_peloton.append(self.__get_time_int()-self.race_time_list_peloton[-1])
                 self.lap_datas[LapData.current_lap-1].button_peloton()
+
             else:
                 print("split_peloton - shouldn't be here")
 
@@ -43,13 +44,14 @@ class SwissWatch:
 
     def split_break(self):
         #TODO
-        if LapData.current_lap > 0:
-            pass
-            # self.split_list_break.append(self.__get_time_int()-self.race_time_list_peloton[-1])
+        if clock_running == 0:
+            if LapData.current_lap > 0:
+                self.lap_datas[LapData.current_lap-1].button_break()
+                # self.split_list_break.append(self.__get_time_int()-self.race_time_list_peloton[-1])
 
-        else:
-            pass
-            # self.split_list_break.append(self.__get_time_int())
+            else:
+                pass
+                # self.split_list_break.append(self.__get_time_int())
 
     # Non-Action function
     def get_running_time(self):
@@ -76,9 +78,22 @@ class SwissWatch:
         #some of requested laps will be beyond the list
         # return ["lap_index " + str(lap_lap + 1), str(pelotonTime), str(pelotonSplit), str(breakSplit), "hey"]
         if lap_index < LapData.current_lap:
-            return ["lap " + str(lap_index + 1), str(LapData.time_peloton[lap_index]), str(self.lap_datas[lap_index].split_peloton), str("what"), "hey"]
+            col_1 = self.__get_time_string(LapData.time_peloton[lap_index])
+            col_2 = self.__get_time_string(self.lap_datas[lap_index].split_peloton)
+            # col_3 = str(self.lap_datas[lap_index].times_break)
+            col_3 = str(self.lap_datas[lap_index].speed_peloton)
+            col_4 = str(self.lap_datas[lap_index].break_lead_out)
+            return ["lap " + str(lap_index + 1), col_1 , col_2, col_3, col_4]
         else:
             return ["lap " + str(lap_index + 1), str("or else"), str("there"), str("what"), "hey"]
+
+    def get_lap_labels(self):
+            col_1 = "Peloton Time"
+            col_2 = "Peloton Split"
+            # col_3 = "Breakaway Time"
+            col_3 = "Peloton MPH"
+            col_4 = "Break Lead out"
+            return ["Lap Number " , col_1 , col_2, col_3, col_4]
 
     # Local functions
     def __get_time_string(self, time_number):
@@ -172,7 +187,7 @@ class LapData:
     #accessed LapData.current_lap
     current_lap = 0
     #lap length in meters, but don't refer to this directly. Use a function so meters can be ditched
-    lap_length = 1600
+    lap_length = 1609
     time_peloton = []
     start_time = 0
 
@@ -183,12 +198,56 @@ class LapData:
             print(str(time.time()-LapData.start_time)+" is the running time?")
             LapData.time_peloton[LapData.current_lap - 1] = int(time.time()-LapData.start_time)
             self.split_peloton = LapData.time_peloton[LapData.current_lap - 1] - LapData.time_peloton[LapData.current_lap - 2]
+            self.lap_calculations()
+            self.speed_calculation()
+
+    def button_break(self):
+        current_time = LapData.get_running_time()
+        self.times_break.append(current_time)
+        #This logs as part of the lap but does not refresh anything yet
+
+        #lead out should be calculated after peloton
+        #current time minus peloton time vs this break time minus pelton
+        # lead_out = int(current_time) - int(LapData.time_peloton[LapData.current_lap - 2])
+        # self.break_lead_out.append(lead_out)
+
+    def lap_calculations(self):
+        #at time of peloton, some calcualtions are made, such as comparisons between break and peloton.  These
+        #were not made when the break went by, because the math relates to the peloton as well.  Break-lead-out being one example
+        lap_lap = self.lap_number
+        this_peloton = LapData.time_peloton[lap_lap]
+
+        for a_break in self.times_break:
+            lead_out = this_peloton - a_break
+            self.break_lead_out.append(lead_out)
+
+        # lead_out = int(current_time) - int(LapData.time_peloton[LapData.current_lap - 2])
+        # self.break_lead_out.append(lead_out)
+    def speed_calculation(self):
+        # miles per hour
+
+        #lap_length currently in meters 1609.34 meters per mile
+        miles = LapData.lap_length / 1609
+        hours = self.split_peloton / 3600
+        if hours != 0:
+            self.speed_peloton = int(miles/hours)
+        else:
+            self.speed_peloton = 0
+            print("trying to divide speed by 0")
+
 
     # @classmethod
     # def laps_init(cls ,start):
     #     #This should behave as an alternate constructer
     #     LapData.start_time = int(start)
     #     cls.__init__()
+
+    @classmethod
+    def get_running_time(self):
+        self.time_read = time.time()
+        sec = int(self.time_read - LapData.get_start_time())
+        return sec
+
 
     @classmethod
     def set_start_time(cls):
@@ -222,13 +281,13 @@ class LapData:
         #as strings to be updated to cool stuff
         #elapsed time for the lap is: time_peloton
         # self.time_peloton = 0 #the time is the race time of the peloton
-        LapData.time_peloton.append("Inti append " + str(LapData.current_lap))
+        LapData.time_peloton.append(0)
         # LapData.time_peloton.append("None2")
-        self.times_break = [0]
-        self.split_peloton = "None1" # the split is the difference in lap times
+        self.times_break = []
+        self.split_peloton = 0 # the split is the difference in lap times
         self.splits_break = ["None"]
-        self.speed_peloton = "None"
+        self.speed_peloton = 0
         self.speeds_break = ["None"]
-        self.break_lead_out = ["None"]
+        self.break_lead_out = []
         # self.split_peloton = "None"
         LapData.current_lap = LapData.current_lap + 1
