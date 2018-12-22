@@ -78,7 +78,7 @@ class SwissWatch:
         #some of requested laps will be beyond the list
         # return ["lap_index " + str(lap_lap + 1), str(pelotonTime), str(pelotonSplit), str(breakSplit), "hey"]
         if lap_index < LapData.current_lap:
-            col_1 = self.__get_time_string(LapData.time_peloton[lap_index])
+            col_1 = self.__get_time_string(self.lap_datas[lap_index].time_pelotona)
             col_2 = self.__get_time_string(self.lap_datas[lap_index].split_peloton)
             # col_3 = str(self.lap_datas[lap_index].times_break)
             col_3 = str(self.lap_datas[lap_index].speed_peloton)
@@ -157,6 +157,16 @@ class SwissWatch:
         for i in self.lap_datas:
             print(i.lap_number)
 
+    def set_inputs(self, lapDistance):
+        # LapData.lap_length = lapDistance
+        LapData.set_lap_length(lapDistance, "meters")
+        print(LapData.lap_length)
+        print(self.lap_datas[0].lap_length)
+        #redo math for MPH for all laps everytime this is called
+        for lap in self.lap_datas:
+            lap.speed_calculation()
+
+
     def __init__(self):
         #single variables
         global clock_running
@@ -190,6 +200,35 @@ class LapData:
     lap_length = 1609
     time_peloton = []
     start_time = 0
+    # theLength = 1609
+
+    @property
+    def time_pelotona(self):
+        theTime = LapData.time_peloton[self.lap_number]
+        print("Time_pelotona = " + str(theTime))
+        return theTime
+    # @property
+    # def lap_length(cls):
+    #     return int(cls.lap_length)
+
+    # @lap_length.setter
+    # def lap_length(cls, aLength, ourScale = "meter"):
+    #     if ourScale == "meter":
+    #         pass
+    #     else:
+    #         #change to meters
+    #         pass
+    #     #Once lap_length is in meters
+    #     cls.lap_length = aLength
+
+    def set_lap_length(inLength, ourScale = "meter"):
+        if ourScale == "meter":
+            pass
+        else:
+            #change to meters
+            pass
+        #Once lap_length is in meters
+        LapData.lap_length = int(inLength)
 
     def button_peloton(self):
         #this should record the peloton race time, split time, create a new lap or increment
@@ -257,6 +296,8 @@ class LapData:
     @classmethod
     def get_start_time(cls):
         return cls.start_time
+
+
 
     def __init__(self, start=None):
         #todo - make certain things a class variable.  LapData.Time_peloton[]
