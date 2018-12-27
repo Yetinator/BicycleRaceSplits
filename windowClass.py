@@ -8,6 +8,7 @@ import tkinter as tk
 import tkinter.filedialog
 from writeClass import *
 from stopWatchClass import SwissWatch
+from buttonClass import piButtons
 
 global rando
 rando = 1
@@ -51,6 +52,7 @@ class MyWindow(AbstractWindow, tk.Tk):
 
 
     def ExitProgram(self):
+        self.myButtons.buttonEnd()
         self.quit()
 
     def MakeScreen(self):
@@ -203,7 +205,8 @@ class MyWindow(AbstractWindow, tk.Tk):
     def looptie_loop(self):
         #any potential looping in this class should be limited to here, or mainloop
         self.RefreshClock()
-        self.after(1, self.looptie_loop)
+        print(str(self.myButtons.get()))
+        self.after(.5, self.looptie_loop)
 
     def start_button(self):
         self.clockers.start()
@@ -233,4 +236,5 @@ class MyWindow(AbstractWindow, tk.Tk):
         #makeConfigure is just my configuration file
         self.MakeConfigure()
         AbstractWindow.__init__(self, *args, **kwargs)
+        self.myButtons = piButtons()
         self.looptie_loop()
