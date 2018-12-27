@@ -3,7 +3,7 @@ import readline
 import string
 from pathlib import Path
 import copy
-#referanceFilePath = "Referance/"
+referanceFilePath = ""
 
 class ReadFile:
     #This class is mainly meant to read variables stored in a text file, and
@@ -20,7 +20,6 @@ class ReadFile:
 
     def __openFile(self):
         self.file_object = open(self.fileName, 'r')
-        #self.file_object = open(str(
 
     def __closeFile(self):
         self.file_object.close()
@@ -85,7 +84,7 @@ class WriteFile:
         #filePath = Path(self.filePath)
         if self.filePath.is_file():
             print('warning! filePath already exists.  Will be written over')
-        self.file_object = open(self.fileName, 'w')
+        self.file_object = open(self.filePath, 'w')
         # print('opened file')
 
     def __closeFile(self):
@@ -100,13 +99,12 @@ class WriteFile:
             # self.localText.join(thisLine)
 
         newText = "\n".join(combineText)
-        with open(self.fileName, 'w') as f:
+        with open(self.filePath, 'w') as f:
             print(newText, file=f)
 
     def __init__(self, fileName, inputDictionary):
         self.fileName = fileName
-        #self.filePath = Path(referanceFilePath + fileName)
-        #self.filePath = Path(fileName)
+        self.filePath = Path(fileName)
         self.dictionaryData = copy.deepcopy(inputDictionary)
         #self.__openFile()
         self.localText = string

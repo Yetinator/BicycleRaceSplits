@@ -9,6 +9,7 @@ import tkinter.filedialog
 from writeClass import *
 from stopWatchClass import SwissWatch
 from buttonClass import piButtons
+import time
 
 global rando
 rando = 1
@@ -88,6 +89,20 @@ class MyWindow(AbstractWindow, tk.Tk):
         Button(text='Breakaway Split', command=self.breakaway_split_button).grid(row=self.position_button_row, column=item_index, sticky=W, pady=4)
         item_index += 1
         Button(text='Start Timer', command=self.start_button).grid(row=self.position_button_row, column=item_index, sticky=W, pady=4)
+
+    def HardButtons(self, aButton):
+        if aButton == False:
+            pass
+
+        if aButton ==  'a':
+            self.peloton_split_button() 
+
+        if aButton == 'b':
+            self.breakaway_split_button()
+
+        if aButton == 'c':
+            self.start_button()
+        
 
     def MakeClock(self):
         #pass this to Makescreen which is called by superclass
@@ -205,8 +220,13 @@ class MyWindow(AbstractWindow, tk.Tk):
     def looptie_loop(self):
         #any potential looping in this class should be limited to here, or mainloop
         self.RefreshClock()
-        print(str(self.myButtons.get()))
-        self.after(.5, self.looptie_loop)
+        out = False
+        out = self.myButtons.get()
+        self.HardButtons(out)
+        #if out != False:
+        #    print(str(out))
+        #    time.sleep(0.2)
+        self.after(1, self.looptie_loop)
 
     def start_button(self):
         self.clockers.start()
