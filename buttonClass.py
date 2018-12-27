@@ -41,10 +41,10 @@ class piButtons:
 
         def get(self):
             button = False
-        	for i in range(self.chan_list):
-        		if GPIO.input(chan_list[i]) == False:
-        			#print(str(i) + ' Button Pressed')
-        			button = self.buttons[i]
+            for i in range(self.chan_list):
+                if GPIO.input(chan_list[i]) == False:
+        	    #print(str(i) + ' Button Pressed')
+                    button = self.buttons[i]
             return button
 
         def buttonEnd(self):
