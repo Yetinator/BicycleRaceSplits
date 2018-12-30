@@ -343,7 +343,7 @@ class TimerPage(tk.Frame):
 
         # FancyWatchApp.ExitProgram(self)
 
-    def PelotonSplitFunction(self):
+    def PelotonSplitFunction():
         global clock_running
         if clockers.get_running_time() == "00:00:00":
             clockers.start()
