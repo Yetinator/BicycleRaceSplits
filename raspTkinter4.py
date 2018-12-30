@@ -46,7 +46,7 @@ class FancyWatchApp(tk.Tk):
 
         self.current_time = tkinter.StringVar()
         self.current_time.set(clockers.get_running_time())
-
+        self.myButtons = piButtons()
         self.frames = {}
 
         #StartPage is a page we are about to make a class for
@@ -254,7 +254,7 @@ class TimerPage(tk.Frame):
         self.thisLapBrk3 = tkinter.StringVar()
         self.currentLapView = clockers.current_lap_index
         self.followCurrentLap = True
-        self.myButtons = piButtons()
+
         # self.thisLapLap.set(self.this_lap_data[0])
         self.updatePage(self.currentLapView)
         #labels
