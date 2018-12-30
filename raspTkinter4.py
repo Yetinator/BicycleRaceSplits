@@ -13,7 +13,7 @@ class FancyWatchApp(tk.Tk):
         tk.Tk.__init__(self, *args, **kwargs)
         container = tk.Frame(self)
 
-        container.grid(row=8, column=8)
+        container.grid(row=8, column=8, sticky=N+S+W+E)
 
         container.grid_rowconfigure(0, weight=1)
         container.grid_columnconfigure(0, weight=1)
@@ -46,7 +46,7 @@ class FancyWatchApp(tk.Tk):
         for F in (StartPage, TimerPage, PageTwo):
             frame = F(container, self)
             self.frames[F] = frame
-            frame.grid(row=0, column=0,  columnspan=8, rowspan=8,sticky="nsew")
+            frame.grid(row=0, column=0,  columnspan=8, rowspan=8,sticky=N+S+W+E)
 
 
         self.show_frame(StartPage)
@@ -69,9 +69,9 @@ GENERIC_X = 1
 GENERIC_Y = 0
 DATA_COLUMN = 2
 #Grid will be 8 x 8
-DATA_FONT = ("Verdana" ,30)
-CLOCK_FONT = ("Verdana" ,60)
-BUTTON_FONT = ("Verdana" ,60)
+DATA_FONT = ("Verdana" ,26)
+CLOCK_FONT = ("Verdana" ,56)
+BUTTON_FONT = ("Verdana" ,56)
 
 
 
@@ -167,16 +167,16 @@ class TimerPage(tk.Frame):
 
     def buttonMe(self, buttons = ["b1","b2","b3","b4"]):
         button1 = tk.Button(self, text=buttons[0], command=self.funcButton1)
-        button1.grid(row=0, column=8, columnspan=1, rowspan=2)
+        button1.grid(row=0, column=8, columnspan=1, rowspan=2, sticky="nsew")
 
         button2 = tk.Button(self, text=buttons[1], command=self.funcButton2)
-        button2.grid(row=2, column=8, columnspan=1, rowspan=2)
+        button2.grid(row=2, column=8, columnspan=1, rowspan=2, sticky="nsew")
 
         button3 = tk.Button(self, text=buttons[2], command=self.funcButton3)
-        button3.grid(row=4, column=8, columnspan=1, rowspan=2)
+        button3.grid(row=4, column=8, columnspan=1, rowspan=2, sticky="nsew")
 
         button4 = tk.Button(self, text=buttons[3], command=self.funcButton4)
-        button4.grid(row=6, column=8, columnspan=1, rowspan=2)
+        button4.grid(row=6, column=8, columnspan=1, rowspan=2, sticky="nsew")
 
     def funcButton1(self):
         print("button1")
