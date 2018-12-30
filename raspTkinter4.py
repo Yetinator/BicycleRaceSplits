@@ -4,6 +4,7 @@ from tkinter import Tk
 import tkinter.filedialog
 from stopWatchClass import SwissWatch
 import time
+from buttonClass import piButtons
 # from tkinter import ttk
 clockers = SwissWatch()
 
@@ -99,7 +100,7 @@ class FancyWatchApp(tk.Tk):
 
     def ExitProgram(self):
         #myButtons relates to the pi actuated buttons only
-        #self.myButtons.buttonEnd()
+        self.myButtons.buttonEnd()
         self.quit()
 
     def GetInputs(self):
@@ -145,18 +146,33 @@ class FancyWatchApp(tk.Tk):
         # self.timer_active.delete(1.0, 2.0)
         # self.timer_active.insert(INSERT, self.clockers.get_running_time())
 
-    def get_this_lap_data(self, lap_lap = None):
-        if lap_lap == None:
-            lap_lap = clockers.current_lap_index - 1
+    def get_this_lap_data(self, lap_lap):
+        # if lap_lap == None:
+        #     lap_lap = clockers.current_lap_index - 1
         print(clockers.get_lap_data(lap_lap))
         return clockers.get_lap_data(lap_lap)
+
+    def HardButtons(self, aButton):
+        if aButton == False:
+            pass
+
+        if aButton ==  'a':
+            self.peloton_split_button()
+
+        if aButton == 'b':
+            self.breakaway_split_button()
+
+        if aButton == 'c':
+            self.start_button()
 
 
     def looptie_loop(self):
         #any potential looping in this class should be limited to here, or mainloop
         self.RefreshClock()
         self.current_time.set(clockers.get_running_time())
-
+        out = False
+        out = self.myButtons.get()
+        self.HardButtons(out)
         # print("hard buttons need to be turned on")
         # out = False
         # out = self.myButtons.get()
@@ -236,8 +252,11 @@ class TimerPage(tk.Frame):
         self.thisLapBrk1 = tkinter.StringVar()
         self.thisLapBrk2 = tkinter.StringVar()
         self.thisLapBrk3 = tkinter.StringVar()
+        self.currentLapView = clockers.current_lap_index
+        self.followCurrentLap = True
+        self.myButtons = piButtons()
         # self.thisLapLap.set(self.this_lap_data[0])
-        self.updatePage()
+        self.updatePage(self.currentLapView)
         #labels
         lapLabel = tk.Label(self, text = "Lap: ", font=DATA_LABEL_FONT)
         lapLabel.grid(row=0, column=0,sticky="nse")
@@ -307,7 +326,9 @@ class TimerPage(tk.Frame):
             clockers.split_peloton()
         # self.this_lap_data
         # self.this_lap_data = FancyWatchApp.get_this_lap_data(self)
-        self.updatePage()
+        if self.followCurrentLap == True:
+            self.currentLapView = clockers.current_lap_index - 1
+        self.updatePage(self.currentLapView)
 
     def funcButton2(self):
         print("button2")
@@ -315,18 +336,28 @@ class TimerPage(tk.Frame):
 
     def funcButton3(self):
         print("button3")
-        # clockers.start()
+        if self.currentLapView < clockers.current_lap_index - 1:
+            self.currentLapView = self.currentLapView + 1
+            self.followCurrentLap = False
+        else:
+            self.followCurrentLap = True
+        self.updatePage(self.currentLapView)
 
     def funcButton4(self):
         print("button4")
-        FancyWatchApp.ExitProgram(self)
+        self.currentLapView = self.currentLapView - 1
+        self.followCurrentLap = False
+        self.updatePage(self.currentLapView)
 
-    def updatePage(self, lap_lap = False):
-        if lap_lap == False:
-            self.this_lap_data = (FancyWatchApp.get_this_lap_data(self))
-            print("Full lap data: " + str(self.this_lap_data))
-        else:
-            self.this_lap_data = (FancyWatchApp.get_this_lap_data(self, lap_lap))
+        # FancyWatchApp.ExitProgram(self)
+
+    def updatePage(self, lap_lap):
+        # if lap_lap == False:
+        #     self.this_lap_data = (FancyWatchApp.get_this_lap_data(self))
+        #     print("Full lap data: " + str(self.this_lap_data))
+        # else:
+        #     self.this_lap_data = (FancyWatchApp.get_this_lap_data(self, lap_lap))
+        self.this_lap_data = (FancyWatchApp.get_this_lap_data(self, lap_lap))
 
         #Don't loop here bro
         lap = str(self.this_lap_data[0]) + ": of :" + str(clockers.current_lap_index)
@@ -336,9 +367,6 @@ class TimerPage(tk.Frame):
         self.thisLapSpl.set(self.this_lap_data[2])
         self.thisLapSpeed.set(self.this_lap_data[3])
         self.thisLapBrk1.set(self.this_lap_data[4])
-
-
-
 
 
 
