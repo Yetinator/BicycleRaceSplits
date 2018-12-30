@@ -121,9 +121,10 @@ class FancyWatchApp(tk.Tk):
         #self.MakeGrid()
 
     def peloton_split_button(self):
-        self.clockers.split_peloton()
-        #todo not calling get_lap_data for a given lap is less than straitforward, although it aims for the most recently completed lap
-        stuff = self.clockers.get_lap_data()
+        TimerPage.PelotonSplitFunction()
+        # self.clockers.split_peloton()
+        # #todo not calling get_lap_data for a given lap is less than straitforward, although it aims for the most recently completed lap
+        # stuff = self.clockers.get_lap_data()
 
         #self.MakeRow(stuff, self.clockers.current_lap_index - 1)
         print("MakeRow is null in this version and needs to be replaced")
@@ -319,16 +320,7 @@ class TimerPage(tk.Frame):
 
     def funcButton1(self):
         print("button1")
-        global clock_running
-        if clockers.get_running_time() == "00:00:00":
-            clockers.start()
-        else:
-            clockers.split_peloton()
-        # self.this_lap_data
-        # self.this_lap_data = FancyWatchApp.get_this_lap_data(self)
-        if self.followCurrentLap == True:
-            self.currentLapView = clockers.current_lap_index - 1
-        self.updatePage(self.currentLapView)
+
 
     def funcButton2(self):
         print("button2")
@@ -350,6 +342,19 @@ class TimerPage(tk.Frame):
         self.updatePage(self.currentLapView)
 
         # FancyWatchApp.ExitProgram(self)
+
+    def PelotonSplitFunction(self):
+        global clock_running
+        if clockers.get_running_time() == "00:00:00":
+            clockers.start()
+        else:
+            clockers.split_peloton()
+        # self.this_lap_data
+        # self.this_lap_data = FancyWatchApp.get_this_lap_data(self)
+        if self.followCurrentLap == True:
+            self.currentLapView = clockers.current_lap_index - 1
+        self.updatePage(self.currentLapView)
+
 
     def updatePage(self, lap_lap):
         # if lap_lap == False:
