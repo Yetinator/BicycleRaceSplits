@@ -48,6 +48,32 @@ class FancyWatchApp(tk.Tk):
             self.frames[F] = frame
             frame.grid(row=0, column=0,  columnspan=8, rowspan=8,sticky=N+S+W+E)
 
+            # frame.grid_rowconfigure()
+            # frame.grid_columnconfigure()
+            frame.grid_rowconfigure(0, weight=1)
+            frame.grid_columnconfigure(0, weight=1)
+
+            frame.grid_rowconfigure(1, weight=1)
+            frame.grid_columnconfigure(1, weight=1)
+
+            frame.grid_rowconfigure(2, weight=1)
+            frame.grid_columnconfigure(2, weight=1)
+
+            frame.grid_rowconfigure(3, weight=1)
+            frame.grid_columnconfigure(3, weight=1)
+
+            frame.grid_rowconfigure(4, weight=1)
+            frame.grid_columnconfigure(4, weight=1)
+
+            frame.grid_rowconfigure(5, weight=1)
+            frame.grid_columnconfigure(5, weight=1)
+
+            frame.grid_rowconfigure(6, weight=1)
+            frame.grid_columnconfigure(6, weight=1)
+
+            frame.grid_rowconfigure(7, weight=1)
+            frame.grid_columnconfigure(7, weight=1)
+
 
         self.show_frame(StartPage)
 
@@ -62,16 +88,17 @@ class FancyWatchApp(tk.Tk):
 
 #startPage class from the codebox above
 
-LARGE_FONT = ("Verdana" ,60)
+LARGE_FONT = ("Verdana" ,54)
 SCREEN_WIDTH = 640
 SCREEN_HEIGHT = 480
 GENERIC_X = 1
 GENERIC_Y = 0
-DATA_COLUMN = 2
+DATA_COLUMN = 1
 #Grid will be 8 x 8
-DATA_FONT = ("Verdana" ,26)
-CLOCK_FONT = ("Verdana" ,56)
-BUTTON_FONT = ("Verdana" ,56)
+DATA_FONT = ("Verdana", 24, 'bold')
+DATA_LABEL_FONT = ("Verdana" ,24)
+CLOCK_FONT = ("Verdana" ,54)
+BUTTON_FONT = ("Verdana" ,48)
 
 
 
@@ -89,16 +116,16 @@ class StartPage(tk.Frame):
         self.buttonMe()
 
     def buttonMe(self, buttons = ["b1","b2","b3","b4"]):
-        button1 = tk.Button(self, text=buttons[0], command=self.funcButton1)
+        button1 = tk.Button(self, text=buttons[0], command=self.funcButton1, font = BUTTON_FONT)
         button1.grid(row=0, column=8, columnspan=1, rowspan=2)
 
-        button2 = tk.Button(self, text=buttons[1], command=self.funcButton2)
+        button2 = tk.Button(self, text=buttons[1], command=self.funcButton2, font = BUTTON_FONT)
         button2.grid(row=2, column=8, columnspan=1, rowspan=2)
 
-        button3 = tk.Button(self, text=buttons[2], command=self.funcButton3)
+        button3 = tk.Button(self, text=buttons[2], command=self.funcButton3, font = BUTTON_FONT)
         button3.grid(row=4, column=8, columnspan=1, rowspan=2)
 
-        button4 = tk.Button(self, text=buttons[3], command=self.funcButton4)
+        button4 = tk.Button(self, text=buttons[3], command=self.funcButton4, font = BUTTON_FONT)
         button4.grid(row=6, column=8, columnspan=1, rowspan=2)
 
     def funcButton1(self):
@@ -122,39 +149,39 @@ class TimerPage(tk.Frame):
         # label.grid(row=GENERIC_Y, column=GENERIC_X, columnspan=2, rowspan=2)
 
         #labels
-        lapLabel = tk.Label(self, text = "Lap", font=DATA_FONT)
-        lapLabel.grid(row=0, column=0,sticky="nsew")
+        lapLabel = tk.Label(self, text = "Lap: ", font=DATA_LABEL_FONT)
+        lapLabel.grid(row=0, column=0,sticky="nse")
 
-        pelLabel = tk.Label(self, text = "Pel", font=DATA_FONT)
-        pelLabel.grid(row=1, column=0,sticky="nsew")
+        pelLabel = tk.Label(self, text = "Pel: ", font=DATA_LABEL_FONT)
+        pelLabel.grid(row=1, column=0,sticky="nse")
 
-        splLabel = tk.Label(self, text = "Spl", font=DATA_FONT)
-        splLabel.grid(row=2, column=0,sticky="nsew")
+        splLabel = tk.Label(self, text = "Spl: ", font=DATA_LABEL_FONT)
+        splLabel.grid(row=2, column=0,sticky="nse")
 
-        brkLabel = tk.Label(self, text = "Brk", font=DATA_FONT)
-        brkLabel.grid(row=3, column=0,sticky="nsew")
+        brkLabel = tk.Label(self, text = "Brk: ", font=DATA_LABEL_FONT)
+        brkLabel.grid(row=3, column=0,sticky="nse")
 
-        mphLabel = tk.Label(self, text = "MPH!", font=DATA_FONT)
-        mphLabel.grid(row=4, column=0,sticky="nsew")
+        mphLabel = tk.Label(self, text = "MPH!: ", font=DATA_LABEL_FONT)
+        mphLabel.grid(row=4, column=0,sticky="nse")
 
-        clockLabel = tk.Label(self, text = "Time", font=DATA_FONT)
-        clockLabel.grid(row=6, column=0,sticky="nsew")
+        clockLabel = tk.Label(self, text = "Time: ", font=DATA_LABEL_FONT)
+        clockLabel.grid(row=6, column=0,sticky="nse")
 
         #Data
         lapData = tk.Label(self, text = "12", font=DATA_FONT)
-        lapData.grid(row=0, column=DATA_COLUMN, columnspan = 2)
+        lapData.grid(row=0, column=DATA_COLUMN, columnspan = 2, sticky = W)
 
         pelData = tk.Label(self, text = "00:32:12.5", font=DATA_FONT)
-        pelData.grid(row=1, column=DATA_COLUMN, columnspan = 2)
+        pelData.grid(row=1, column=DATA_COLUMN, columnspan = 2, sticky = W)
 
         splData = tk.Label(self, text = "03:22.3", font=DATA_FONT)
-        splData.grid(row=2, column=DATA_COLUMN, columnspan = 2)
+        splData.grid(row=2, column=DATA_COLUMN, columnspan = 2, sticky = W)
 
         brkData = tk.Label(self, text = "27.3/24.2/17.1", font=DATA_FONT)
-        brkData.grid(row=3, column=DATA_COLUMN, columnspan = 2)
+        brkData.grid(row=3, column=DATA_COLUMN, columnspan = 2, sticky = W)
 
         mphData = tk.Label(self, text = "27.6", font=DATA_FONT)
-        mphData.grid(row=4, column=DATA_COLUMN, columnspan = 2)
+        mphData.grid(row=4, column=DATA_COLUMN, columnspan = 2, sticky = W)
 
 
         # clockText = tk.Text(self)
@@ -165,17 +192,17 @@ class TimerPage(tk.Frame):
 
         self.buttonMe()
 
-    def buttonMe(self, buttons = ["b1","b2","b3","b4"]):
-        button1 = tk.Button(self, text=buttons[0], command=self.funcButton1)
+    def buttonMe(self, buttons = ["pel","brk","b3","scn"]):
+        button1 = tk.Button(self, text=buttons[0], command=self.funcButton1, font = BUTTON_FONT)
         button1.grid(row=0, column=8, columnspan=1, rowspan=2, sticky="nsew")
 
-        button2 = tk.Button(self, text=buttons[1], command=self.funcButton2)
+        button2 = tk.Button(self, text=buttons[1], command=self.funcButton2, font = BUTTON_FONT)
         button2.grid(row=2, column=8, columnspan=1, rowspan=2, sticky="nsew")
 
-        button3 = tk.Button(self, text=buttons[2], command=self.funcButton3)
+        button3 = tk.Button(self, text=buttons[2], command=self.funcButton3, font = BUTTON_FONT)
         button3.grid(row=4, column=8, columnspan=1, rowspan=2, sticky="nsew")
 
-        button4 = tk.Button(self, text=buttons[3], command=self.funcButton4)
+        button4 = tk.Button(self, text=buttons[3], command=self.funcButton4, font = BUTTON_FONT)
         button4.grid(row=6, column=8, columnspan=1, rowspan=2, sticky="nsew")
 
     def funcButton1(self):
