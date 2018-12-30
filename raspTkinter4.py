@@ -2,7 +2,10 @@ import tkinter as tk
 from tkinter import *
 from tkinter import Tk
 import tkinter.filedialog
+from stopWatchClass import SwissWatch
+import time
 # from tkinter import ttk
+clockers = SwissWatch()
 
 
 #this codebox represents a "baseline" future "StartPage" will be defined later
@@ -11,6 +14,7 @@ class FancyWatchApp(tk.Tk):
     def __init__(self, *args, **kwargs):
 
         tk.Tk.__init__(self, *args, **kwargs)
+
         container = tk.Frame(self)
 
         container.grid(row=8, column=8, sticky=N+S+W+E)
@@ -39,6 +43,8 @@ class FancyWatchApp(tk.Tk):
         container.grid_rowconfigure(7, weight=5)
         container.grid_columnconfigure(7, weight=5)
 
+        self.current_time = tkinter.StringVar()
+        self.current_time.set(clockers.get_running_time())
 
         self.frames = {}
 
@@ -74,6 +80,12 @@ class FancyWatchApp(tk.Tk):
             frame.grid_rowconfigure(7, weight=1)
             frame.grid_columnconfigure(7, weight=1)
 
+        #fancy watch app __init__ continued
+
+
+        #self.myButtons = piButtons()
+        print('myButtons line 81 needs to be turned on')
+        self.looptie_loop()
 
         self.show_frame(StartPage)
 
@@ -85,6 +97,75 @@ class FancyWatchApp(tk.Tk):
         frame.tkraise()
         # frame.grid()
 
+    def ExitProgram(self):
+        #myButtons relates to the pi actuated buttons only
+        #self.myButtons.buttonEnd()
+        self.quit()
+
+    def GetInputs(self):
+        #This retrieves inputs from user and can happen during or before the race
+        # for input in self.inputBoxOutput:
+        #     # temp = input.get("1.0",'end-1c')
+        #     temp = input.get()
+        #     print(temp)
+
+        #None of this exists yet
+        print("Get Inputs function in progress")
+        # lapDistance = int(self.inputBoxOutput[1].get())
+        # self.clockers.set_inputs(lapDistance)
+
+    def test_button(self):
+        # self.clockers.test_button()
+        print("test_button not configured")
+        #self.MakeGrid()
+
+    def peloton_split_button(self):
+        self.clockers.split_peloton()
+        #todo not calling get_lap_data for a given lap is less than straitforward, although it aims for the most recently completed lap
+        stuff = self.clockers.get_lap_data()
+
+        #self.MakeRow(stuff, self.clockers.current_lap_index - 1)
+        print("MakeRow is null in this version and needs to be replaced")
+        #this needs to be current_lap_index - 1 because the lap increments just before makerow is called.
+        #because the next lap is made before we are even saving information to it, this makes us ahead of the index
+        #todo, make this more straitforward to access in case of change in front end
+
+    def breakaway_split_button(self):
+        self.clockers.split_break()
+        stuff = self.clockers.get_lap_data()
+
+        print("MakeRow is null in this version and needs to be replaced")
+        # self.MakeRow(stuff, self.clockers.current_lap_index - 1)
+        #this needs to be current_lap_index - 1 because the lap increments just before makerow is called.
+        #because the next lap is made before we are even saving information to it, this makes us ahead of the index
+
+    def RefreshClock(self):
+        #don't forget to clear the clock
+        pass
+        # self.timer_active.delete(1.0, 2.0)
+        # self.timer_active.insert(INSERT, self.clockers.get_running_time())
+
+    def get_this_lap_data(self, lap_lap = None):
+        if lap_lap == None:
+            lap_lap = clockers.current_lap_index - 1
+        print(clockers.get_lap_data(lap_lap))
+        return clockers.get_lap_data(lap_lap)
+
+
+    def looptie_loop(self):
+        #any potential looping in this class should be limited to here, or mainloop
+        self.RefreshClock()
+        self.current_time.set(clockers.get_running_time())
+
+        # print("hard buttons need to be turned on")
+        # out = False
+        # out = self.myButtons.get()
+        #self.HardButtons(out)
+
+        #if out != False:
+        #    print(str(out))
+        #    time.sleep(0.2)
+        self.after(1, self.looptie_loop)
 
 #startPage class from the codebox above
 
@@ -98,7 +179,7 @@ DATA_COLUMN = 1
 DATA_FONT = ("Verdana", 24, 'bold')
 DATA_LABEL_FONT = ("Verdana" ,24)
 CLOCK_FONT = ("Verdana" ,54)
-BUTTON_FONT = ("Verdana" ,48)
+BUTTON_FONT = ("Verdana" ,44)
 
 
 
@@ -147,7 +228,16 @@ class TimerPage(tk.Frame):
 
         # label = tk.Label(self, text = "Timer_Page", font=LARGE_FONT)
         # label.grid(row=GENERIC_Y, column=GENERIC_X, columnspan=2, rowspan=2)
-
+        self.this_lap_data = ['lap 5', '00:00:04', '00:00:00', '0', '[]']
+        self.thisLapLap = tkinter.StringVar()
+        self.thisLapPel = tkinter.StringVar()
+        self.thisLapSpl = tkinter.StringVar()
+        self.thisLapSpeed = tkinter.StringVar()
+        self.thisLapBrk1 = tkinter.StringVar()
+        self.thisLapBrk2 = tkinter.StringVar()
+        self.thisLapBrk3 = tkinter.StringVar()
+        # self.thisLapLap.set(self.this_lap_data[0])
+        self.updatePage()
         #labels
         lapLabel = tk.Label(self, text = "Lap: ", font=DATA_LABEL_FONT)
         lapLabel.grid(row=0, column=0,sticky="nse")
@@ -168,29 +258,32 @@ class TimerPage(tk.Frame):
         clockLabel.grid(row=6, column=0,sticky="nse")
 
         #Data
-        lapData = tk.Label(self, text = "12", font=DATA_FONT)
+        lapData = tk.Label(self, textvariable = self.thisLapLap, font=DATA_FONT)
         lapData.grid(row=0, column=DATA_COLUMN, columnspan = 2, sticky = W)
 
-        pelData = tk.Label(self, text = "00:32:12.5", font=DATA_FONT)
+        pelData = tk.Label(self, textvariable = self.thisLapPel, font=DATA_FONT)
         pelData.grid(row=1, column=DATA_COLUMN, columnspan = 2, sticky = W)
 
-        splData = tk.Label(self, text = "03:22.3", font=DATA_FONT)
+        splData = tk.Label(self, textvariable = self.thisLapSpl, font=DATA_FONT)
         splData.grid(row=2, column=DATA_COLUMN, columnspan = 2, sticky = W)
 
-        brkData = tk.Label(self, text = "27.3/24.2/17.1", font=DATA_FONT)
+        brkData = tk.Label(self, textvariable = self.thisLapBrk1, font=DATA_FONT)
         brkData.grid(row=3, column=DATA_COLUMN, columnspan = 2, sticky = W)
 
-        mphData = tk.Label(self, text = "27.6", font=DATA_FONT)
+        mphData = tk.Label(self, textvariable = self.thisLapSpeed, font=DATA_FONT)
         mphData.grid(row=4, column=DATA_COLUMN, columnspan = 2, sticky = W)
 
 
         # clockText = tk.Text(self)
         # clockText.grid(row=0, column=1, columnspan=3)
         # clockText.insert(INSERT, "00:00:00.0")
-        clockText = tk.Label(self, text = "00:00:00.0", font=CLOCK_FONT, bg = 'cyan')
-        clockText.grid(row=6, column=1, columnspan = 2)
+
+        self.clockText = tk.Label(self, textvariable = controller.current_time, font=CLOCK_FONT, bg = 'cyan')
+        self.clockText.grid(row=6, column=1, columnspan = 2)
 
         self.buttonMe()
+
+
 
     def buttonMe(self, buttons = ["pel","brk","b3","scn"]):
         button1 = tk.Button(self, text=buttons[0], command=self.funcButton1, font = BUTTON_FONT)
@@ -207,15 +300,46 @@ class TimerPage(tk.Frame):
 
     def funcButton1(self):
         print("button1")
+        global clock_running
+        if clockers.get_running_time() == "00:00:00":
+            clockers.start()
+        else:
+            clockers.split_peloton()
+        # self.this_lap_data
+        # self.this_lap_data = FancyWatchApp.get_this_lap_data(self)
+        self.updatePage()
 
     def funcButton2(self):
         print("button2")
+        clockers.split_break()
 
     def funcButton3(self):
         print("button3")
+        # clockers.start()
 
     def funcButton4(self):
         print("button4")
+        FancyWatchApp.ExitProgram(self)
+
+    def updatePage(self, lap_lap = False):
+        if lap_lap == False:
+            self.this_lap_data = (FancyWatchApp.get_this_lap_data(self))
+            print("Full lap data: " + str(self.this_lap_data))
+        else:
+            self.this_lap_data = (FancyWatchApp.get_this_lap_data(self, lap_lap))
+
+        #Don't loop here bro
+        lap = str(self.this_lap_data[0]) + ": of :" + str(clockers.current_lap_index)
+        print("lap is " + str(lap))
+        self.thisLapLap.set(lap)
+        self.thisLapPel.set(self.this_lap_data[1])
+        self.thisLapSpl.set(self.this_lap_data[2])
+        self.thisLapSpeed.set(self.this_lap_data[3])
+        self.thisLapBrk1.set(self.this_lap_data[4])
+
+
+
+
 
 
 class PageTwo(tk.Frame):

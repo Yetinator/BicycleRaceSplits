@@ -83,7 +83,7 @@ class SwissWatch:
             # col_3 = str(self.lap_datas[lap_index].times_break)
             col_3 = str(self.lap_datas[lap_index].speed_peloton)
             col_4 = str(self.lap_datas[lap_index].break_lead_out)
-            return ["lap " + str(lap_index + 1), col_1 , col_2, col_3, col_4]
+            return [str(lap_index + 1), col_1 , col_2, col_3, col_4]
         else:
             return ["lap " + str(lap_index + 1), str("or else"), str("there"), str("what"), "hey"]
 
