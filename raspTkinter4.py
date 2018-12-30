@@ -5,6 +5,7 @@ import tkinter.filedialog
 from stopWatchClass import SwissWatch
 import time
 from buttonClass import piButtons
+import RPi.GPIO as GPIO
 # from tkinter import ttk
 clockers = SwissWatch()
 
@@ -46,7 +47,7 @@ class FancyWatchApp(tk.Tk):
 
         self.current_time = tkinter.StringVar()
         self.current_time.set(clockers.get_running_time())
-        self.myButtons = piButtons()
+        # self.myButtons = piButtons()
         self.frames = {}
 
         #StartPage is a page we are about to make a class for
@@ -100,7 +101,7 @@ class FancyWatchApp(tk.Tk):
 
     def ExitProgram(self):
         #myButtons relates to the pi actuated buttons only
-        self.myButtons.buttonEnd()
+        # self.myButtons.buttonEnd()
         self.quit()
 
     def GetInputs(self):
@@ -167,13 +168,14 @@ class FancyWatchApp(tk.Tk):
             self.start_button()
 
 
+
     def looptie_loop(self):
         #any potential looping in this class should be limited to here, or mainloop
         self.RefreshClock()
         self.current_time.set(clockers.get_running_time())
-        out = False
-        out = self.myButtons.get()
-        self.HardButtons(out)
+        # out = False
+        # out = self.myButtons.get()
+        # self.HardButtons(out)
         # print("hard buttons need to be turned on")
         # out = False
         # out = self.myButtons.get()
@@ -420,8 +422,31 @@ class PageTwo(tk.Frame):
     def funcButton4(self):
         print("button4")
 
+def func1(var):
+    print("Button pressed.  Button 1")
+    app.frames[TimerPage].PelotonSplitFunction()
+
+def func2(var):
+    print("Button pressed.  Button 2")
+
+def func3(var):
+    print("Button pressed.  Button 3")
+
+def func4(var):
+    print("Button pressed.  Button 4")
+
 
 app = FancyWatchApp()
 app.geometry('640x480')
+
+GPIO.setmode(GPIO.BCM)
+chan_list = [17,22,23,27]
+GPIO.setup(chan_list, GPIO.IN, pull_up_down=GPIO.PUD_UP)
+
+GPIO.add_event_detect(chan_list[0], GPIO.BOTH, callback = func1, bouncetime=300)
+GPIO.add_event_detect(chan_list[1], GPIO.BOTH, callback = func2, bouncetime=300)
+GPIO.add_event_detect(chan_list[2], GPIO.BOTH, callback = func3, bouncetime=300)
+GPIO.add_event_detect(chan_list[3], GPIO.BOTH, callback = func4, bouncetime=300)
+# run = True
 
 app.mainloop()
