@@ -238,6 +238,6 @@ class PageTwo(tk.Frame):
 
 
 app = FancyWatchApp()
-app.geometry('320x240')
+app.geometry('640x480')
 
 app.mainloop()
