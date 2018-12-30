@@ -230,6 +230,7 @@ class StartPage(tk.Frame):
 
     def funcButton1(self):
         print("button1")
+        controller.show_frame(TimerPage)
 
     def funcButton2(self):
         print("button2")
@@ -307,7 +308,7 @@ class TimerPage(tk.Frame):
 
 
 
-    def buttonMe(self, buttons = ["pel","brk","b3","scn"]):
+    def buttonMe(self, buttons = ["blk","blk","lp>","lp<"]):
         button1 = tk.Button(self, text=buttons[0], command=self.funcButton1, font = BUTTON_FONT)
         button1.grid(row=0, column=8, columnspan=1, rowspan=2, sticky="nsew")
 
@@ -322,11 +323,11 @@ class TimerPage(tk.Frame):
 
     def funcButton1(self):
         print("button1")
-
+        controller.show_frame(StartPage)
 
     def funcButton2(self):
         print("button2")
-        clockers.split_break()
+
 
     def funcButton3(self):
         print("button3")
@@ -357,6 +358,8 @@ class TimerPage(tk.Frame):
             self.currentLapView = clockers.current_lap_index - 1
         self.updatePage(self.currentLapView)
 
+    def BreakAwaySplitFunction(self):
+        clockers.split_break()
 
     def updatePage(self, lap_lap):
         # if lap_lap == False:
@@ -428,6 +431,7 @@ def func1(var):
 
 def func2(var):
     print("Button pressed.  Button 2")
+    app.frames[TimerPage].BreakAwaySplitFunction()
 
 def func3(var):
     print("Button pressed.  Button 3")
