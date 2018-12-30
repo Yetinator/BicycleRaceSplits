@@ -121,7 +121,7 @@ class FancyWatchApp(tk.Tk):
         #self.MakeGrid()
 
     def peloton_split_button(self):
-        self.TimerPage.PelotonSplitFunction()
+        TimerPage.PelotonSplitFunction()
         # self.clockers.split_peloton()
         # #todo not calling get_lap_data for a given lap is less than straitforward, although it aims for the most recently completed lap
         # stuff = self.clockers.get_lap_data()
