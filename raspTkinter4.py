@@ -62,16 +62,16 @@ class FancyWatchApp(tk.Tk):
 
 #startPage class from the codebox above
 
-LARGE_FONT = ("Verdana" ,14)
-SCREEN_WIDTH = 320
-SCREEN_HEIGHT = 240
+LARGE_FONT = ("Verdana" ,60)
+SCREEN_WIDTH = 640
+SCREEN_HEIGHT = 480
 GENERIC_X = 1
 GENERIC_Y = 0
 DATA_COLUMN = 2
 #Grid will be 8 x 8
-DATA_FONT = ("Verdana" ,8)
-CLOCK_FONT = ("Verdana" ,14)
-BUTTON_FONT = ("Verdana" ,14)
+DATA_FONT = ("Verdana" ,30)
+CLOCK_FONT = ("Verdana" ,60)
+BUTTON_FONT = ("Verdana" ,60)
 
 
 
