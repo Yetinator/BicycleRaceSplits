@@ -8,7 +8,7 @@ import tkinter as tk
 import tkinter.filedialog
 from writeClass import *
 from stopWatchClass import SwissWatch
-from buttonClass import piButtons
+# from buttonClass import piButtons
 import time
 
 global rando
@@ -53,7 +53,7 @@ class MyWindow(AbstractWindow, tk.Tk):
 
 
     def ExitProgram(self):
-        self.myButtons.buttonEnd()
+        # self.myButtons.buttonEnd()
         self.quit()
 
     def MakeScreen(self):
@@ -95,14 +95,14 @@ class MyWindow(AbstractWindow, tk.Tk):
             pass
 
         if aButton ==  'a':
-            self.peloton_split_button() 
+            self.peloton_split_button()
 
         if aButton == 'b':
             self.breakaway_split_button()
 
         if aButton == 'c':
             self.start_button()
-        
+
 
     def MakeClock(self):
         #pass this to Makescreen which is called by superclass
@@ -221,7 +221,7 @@ class MyWindow(AbstractWindow, tk.Tk):
         #any potential looping in this class should be limited to here, or mainloop
         self.RefreshClock()
         out = False
-        out = self.myButtons.get()
+        # out = self.myButtons.get()
         self.HardButtons(out)
         #if out != False:
         #    print(str(out))
@@ -256,5 +256,5 @@ class MyWindow(AbstractWindow, tk.Tk):
         #makeConfigure is just my configuration file
         self.MakeConfigure()
         AbstractWindow.__init__(self, *args, **kwargs)
-        self.myButtons = piButtons()
+        # self.myButtons = piButtons()
         self.looptie_loop()

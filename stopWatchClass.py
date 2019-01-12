@@ -32,7 +32,7 @@ class SwissWatch:
         #also must increment lap counte
         if clock_running == 0:
         #if running
-            if LapData.current_lap > 0:
+            if LapData.current_lap > -1:
                 #if not first lap (position 0)
                 # self.split_list_peloton.append(self.__get_time_int()-self.race_time_list_peloton[-1])
                 self.lap_datas[LapData.current_lap-1].button_peloton()
@@ -64,6 +64,17 @@ class SwissWatch:
         else:
             return self.t
 
+    def get_running_split_time(self):
+        global clock_running
+        if(clock_running==0):
+            self.time_read = time.time()
+            sec = int(self.time_read - LapData.get_start_time())
+            if LapData.current_lap > 1:
+                sec = sec - int(LapData.time_peloton[-2])
+            split = self.__get_time_string(sec)
+            return split[3:]
+        else:
+            return "00:00"
     # def get_lap_data(self):
     #     lap = LapData.current_lap
     #     return get_lap_data(lap)
@@ -94,6 +105,11 @@ class SwissWatch:
             col_3 = "Peloton MPH"
             col_4 = "Break Lead out"
             return ["Lap Number " , col_1 , col_2, col_3, col_4]
+
+    def get_race_data(self):
+        avg = round(LapData.avg_lap_time(),0)
+        avg = self.__get_time_string(avg)
+        return[avg[3:]]
 
     # Local functions
     def __get_time_string(self, time_number):
@@ -157,15 +173,18 @@ class SwissWatch:
         for i in self.lap_datas:
             print(i.lap_number)
 
-    def set_inputs(self, lapDistance):
+    def set_inputs(self, lapDistance, units="meters"):
         # LapData.lap_length = lapDistance
-        LapData.set_lap_length(lapDistance, "meters")
+        LapData.set_lap_length(lapDistance, units)
         print(LapData.lap_length)
         print(self.lap_datas[0].lap_length)
         #redo math for MPH for all laps everytime this is called
         for lap in self.lap_datas:
             lap.speed_calculation()
 
+    def get_lap_miles(self):
+        lapDistance = round(LapData.lap_length/1609,1)
+        return lapDistance
 
     def __init__(self):
         #single variables
@@ -200,13 +219,27 @@ class LapData:
     lap_length = 1609
     time_peloton = []
     start_time = 0
+    # avg_lap_time = 0
     # theLength = 1609
 
     @property
     def time_pelotona(self):
         theTime = LapData.time_peloton[self.lap_number]
-        print("Time_pelotona = " + str(theTime))
+        # print("Time_pelotona = " + str(theTime))
         return theTime
+
+    @classmethod
+    def avg_lap_time(self):
+        sum = 0
+        if LapData.current_lap < 2:
+            return 0
+
+        else:
+            lap = LapData.current_lap - 1
+            print("lap is : " + str(lap))
+            total = LapData.time_peloton[lap-1]
+            print("total is : " + str(total))
+            return (round(total/lap,0))
     # @property
     # def lap_length(cls):
     #     return int(cls.lap_length)
@@ -222,13 +255,16 @@ class LapData:
     #     cls.lap_length = aLength
 
     def set_lap_length(inLength, ourScale = "meter"):
+        convertedLength = float(inLength)
         if ourScale == "meter":
             pass
+        elif (ourScale == "miles"):
+            convertedLength = round(float(inLength)*1609,0)
         else:
             #change to meters
             pass
         #Once lap_length is in meters
-        LapData.lap_length = int(inLength)
+        LapData.lap_length = int(convertedLength)
 
     def button_peloton(self):
         #this should record the peloton race time, split time, create a new lap or increment
@@ -236,7 +272,10 @@ class LapData:
             #Todo, if time_peloton isn't already set
             print(str(time.time()-LapData.start_time)+" is the running time?")
             LapData.time_peloton[LapData.current_lap - 1] = int(time.time()-LapData.start_time)
-            self.split_peloton = LapData.time_peloton[LapData.current_lap - 1] - LapData.time_peloton[LapData.current_lap - 2]
+            if LapData.current_lap > 1:
+                self.split_peloton = LapData.time_peloton[LapData.current_lap - 1] - LapData.time_peloton[LapData.current_lap - 2]
+            else:
+                self.split_peloton = LapData.time_peloton[LapData.current_lap - 1]
             self.lap_calculations()
             self.speed_calculation()
 
@@ -273,6 +312,7 @@ class LapData:
         else:
             self.speed_peloton = 0
             print("trying to divide speed by 0")
+
 
 
     # @classmethod
