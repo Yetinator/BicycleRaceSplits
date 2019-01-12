@@ -4,9 +4,12 @@ from tkinter import Tk
 import tkinter.filedialog
 from stopWatchClass import SwissWatch
 import time
+import os
 #from buttonClass import piButtons
-#import RPi.GPIO as GPIO
+
 #GPIO exists here, at the end of this file, and in the buttonclass
+# import RPi.GPIO as GPIO
+
 # from tkinter import ttk
 clockers = SwissWatch()
 
@@ -105,6 +108,10 @@ class FancyWatchApp(tk.Tk):
     def ExitProgram(self):
         #myButtons relates to the pi actuated buttons only
         # self.myButtons.buttonEnd()
+        try:
+            SoftButtonsReplaceGPIO.quit()
+        except:
+            print("not quitting SoftButtonsReplaceGPIO")
         self.quit()
 
     def GetInputs(self):
@@ -235,7 +242,7 @@ class StartPage(tk.Frame):
         self.buttonMenu()
         self.buttonMe()
 
-    def buttonMenu(self, buttons = ["START","FIXME","RACEINPUT","FULLSREEN","EXIT","SAVE/EXIT","blk","blk","blk","blk","blk","blk"]):
+    def buttonMenu(self, buttons = ["START","FIXME","blk","EXIT","FULLSREEN","RACEINPUT","blk","blk","blk","blk","blk","blk"]):
         menuButton1 = tk.Button(self, text=buttons[0], command=self.funcMenuButton1, font = BUTTON_FONT_MENU)
         #note functionmenubutton1 has been disabled
         #menuButton1 = tk.Button(self, text=buttons[0], command=lambda: controller.show_frame(TimerPage), font = BUTTON_FONT_MENU)
@@ -275,22 +282,27 @@ class StartPage(tk.Frame):
         # menuButton12.grid(row=BUTTON_MENU_ROW4, column=BUTTON_MENU_COLUMN3, columnspan=1, rowspan=2, sticky="nsew")
 
     def funcMenuButton1(self):
+        #go to main lap screen
         self.controller.show_frame(TimerPage)
 
     def funcMenuButton2(self):
         print("Fix this broken thing")
 
     def funcMenuButton3(self):
-        self.controller.show_frame(RaceInputPage)
+        print("Fix this broken thing")
 
     def funcMenuButton4(self):
+        #exit program
+        self.controller.ExitProgram()
         print("Fix this broken thing")
 
     def funcMenuButton5(self):
         print("Fix this broken thing")
 
     def funcMenuButton6(self):
-        print("Fix this broken thing")
+        #go to race inputs to log inputs
+        self.controller.show_frame(RaceInputPage)
+
 
     def funcMenuButton7(self):
         print("Fix this broken thing")
@@ -622,6 +634,44 @@ class RaceInputPage(tk.Frame):
 
 
 #The end of page classes
+
+class SoftButtonsReplaceGPIO(tk.Tk):
+    #This is to run stuff on the desktop instead of raspberry pi
+    def __init__(self, *args, **kwargs):
+        tk.Tk.__init__(self, *args, **kwargs)
+        self.buttonMe()
+
+    def buttonMe(self, buttons = ["GPIO17","GPIO22","GPIO23","GPIO27"]):
+        button1 = tk.Button(self, text=buttons[0], command=self.funcButton1, font = BUTTON_FONT)
+        button1.grid(row=0, column=0, columnspan=1, rowspan=2, sticky="nsew")
+
+        button2 = tk.Button(self, text=buttons[1], command=self.funcButton2, font = BUTTON_FONT)
+        button2.grid(row=2, column=0, columnspan=1, rowspan=2, sticky="nsew")
+
+        button3 = tk.Button(self, text=buttons[2], command=self.funcButton3, font = BUTTON_FONT)
+        button3.grid(row=4, column=0, columnspan=1, rowspan=2, sticky="nsew")
+
+        button4 = tk.Button(self, text=buttons[3], command=self.funcButton4, font = BUTTON_FONT)
+        button4.grid(row=6, column=0, columnspan=1, rowspan=2, sticky="nsew")
+
+    def funcButton1(self):
+        print("GPIO17")
+        func1(1)
+
+    def funcButton2(self):
+        print("GPIO22")
+        func2(1)
+
+    def funcButton3(self):
+        print("GPIO23")
+        func3(1)
+
+    def funcButton4(self):
+        print("GPIO27")
+        func4(1)
+
+
+
 def func1(var):
     print("Button pressed.  Button 1")
     app.frames[TimerPage].PelotonSplitFunction()
@@ -635,11 +685,12 @@ def func3(var):
 
 def func4(var):
     print("Button pressed.  Button 4")
+    os.system("xset dpms force off")
 
 
 app = FancyWatchApp()
 app.geometry('640x480')
-
+boardReplace = SoftButtonsReplaceGPIO()
 #Add all this back for raspberry pi
 # GPIO.setmode(GPIO.BCM)
 # chan_list = [17,22,23,27]
@@ -649,6 +700,6 @@ app.geometry('640x480')
 # GPIO.add_event_detect(chan_list[1], GPIO.BOTH, callback = func2, bouncetime=300)
 # GPIO.add_event_detect(chan_list[2], GPIO.BOTH, callback = func3, bouncetime=300)
 # GPIO.add_event_detect(chan_list[3], GPIO.BOTH, callback = func4, bouncetime=300)
-# run = True
+run = True
 
 app.mainloop()
